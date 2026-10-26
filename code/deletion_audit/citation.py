@@ -4,7 +4,8 @@ A file is citable only when its manifest ``captured_at`` is at or before the
 Audit cutoff (a bundle exported after the cutoff is never cited, even for an
 inner snapshot taken before it). Among citable files that show the Resource in
 its resolved state, the latest file wins; ties go to the lowest id. An omission
-cites the latest citable covering Snapshot.
+cites the latest citable covering Snapshot. Only when no file qualifies is the
+deciding record cited by its own capture time.
 """
 
 from .evidence import ABSENT
@@ -34,4 +35,9 @@ def cite(category, resource_id, resolution, store, audit_at):
         # The deciding Observation sits in a file exported after the cutoff (or the
         # state came from omission): cite a covering Snapshot that lacks the row.
         best = _omission_proof(category, resource_id, store, audit_at)
+    if best is None:
+        # Last resort: the record that decided the state. Its own capture time is
+        # within the cutoff even though its file was exported later (a bundle
+        # snapshot taken at audit_at), so it is the only proof that exists.
+        best = resolution.proof
     return best.evidence_id if best else ""

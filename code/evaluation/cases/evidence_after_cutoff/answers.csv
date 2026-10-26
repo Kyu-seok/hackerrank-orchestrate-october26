@@ -1,0 +1,2 @@
+case_id,deletion_status,steps_json
+eval_cutoff_01,COMPLETE,"[{""evidence_id"":""evidence_10"",""operation"":""VERIFY_RECORD_ABSENT"",""phase"":""VERIFICATION"",""resource_id"":""account_005"",""state"":""ABSENT"",""step_no"":1,""system_id"":""account_service""}]"
