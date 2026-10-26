@@ -3,7 +3,7 @@
 import csv
 import sys
 
-from . import classification, steps, treatments
+from . import classification, llm, steps, treatments
 from .activities import WorkerActions
 from .attribution import Attributor
 from .citation import resolve
@@ -83,21 +83,21 @@ def run(requests_path, output_path, strict=False):
         missing = [r.case_id for r in requests if auditor.classifier.decide(r) is None]
         if missing:
             raise ClassificationMissing(
-                "%d request(s) have no cached deletion-request classification (%s). Fill the cache "
-                "once with: %s (ANTHROPIC_API_KEY set)" % (len(missing), _summary(missing), FILL_COMMAND))
+                "%d request(s) have no cached deletion-request classification (%s). %s"
+                % (len(missing), _summary(missing), llm.fill_hint(FILL_COMMAND)))
     rows = []
     for request in requests:
         status, case_steps = auditor.audit(request)
         rows.append((request.case_id, status, steps.serialize(case_steps)))
     with open(output_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
+        writer = csv.writer(f, lineterminator="\n")  # LF, as committed and as sample_output.csv
         writer.writerow(["case_id", "deletion_status", "steps_json"])
         writer.writerows(rows)
     if auditor.unclassified:
         print("warning: %d request(s) have no cached deletion-request classification and were audited "
-              "as deletion requests (%s). Fill the cache once with: %s (ANTHROPIC_API_KEY set); "
-              "pass --strict to fail instead." % (len(auditor.unclassified), _summary(auditor.unclassified),
-                                                  FILL_COMMAND), file=sys.stderr)
+              "as deletion requests (%s). %s; pass --strict to fail instead."
+              % (len(auditor.unclassified), _summary(auditor.unclassified), llm.fill_hint(FILL_COMMAND)),
+              file=sys.stderr)
     return rows
 
 

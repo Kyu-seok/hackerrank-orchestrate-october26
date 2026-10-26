@@ -10,7 +10,8 @@ from dataclasses import dataclass
 from typing import Callable, Optional
 
 from . import conditional, treatments
-from .evidence import ABSENT, PRESENT
+from .flags import flag
+from .states import ABSENT, ACTIVE, BLOCKED, DISABLED, PRESENT
 
 
 @dataclass(frozen=True)
@@ -55,7 +56,7 @@ def category_for(system_id, resource_id):
 
 
 def presence(observation):
-    """State of a record whose only question is whether it still exists."""
+    """State of a Resource whose only question is whether it still exists."""
     return ABSENT if observation.presence == ABSENT else PRESENT
 
 
@@ -65,28 +66,11 @@ USER_PROFILE = register(Category(
 
 
 # -- Data flows and restore paths ----------------------------------------------
-# Their state is a switch, not a record's presence: a connector is ACTIVE or
+# Their state is a switch, not a Resource's presence: a connector is ACTIVE or
 # DISABLED, a backup's restore path is ACTIVE (restorable) or BLOCKED. Sources
 # state it as a check result (ACTIVE/DISABLED/BLOCKED), a flag (``enabled``,
 # ``restore_allowed``: bool, 0/1 or "true"/"false"), a restore evaluation
 # (``eligible``/``deletion_block``) or an authorization decision (``deny``).
-ACTIVE = "ACTIVE"
-DISABLED = "DISABLED"
-BLOCKED = "BLOCKED"
-
-
-def _flag(value):
-    """True/False for a boolean-like field value, None when absent or unreadable."""
-    if value is None:
-        return None
-    text = str(value).strip().lower()
-    if text in ("true", "1", "yes"):
-        return True
-    if text in ("false", "0", "no"):
-        return False
-    return None
-
-
 def _switch(observation, flag_fields, off_state):
     """ACTIVE unless the Observation shows the switch off. Unknown counts as ACTIVE."""
     result = observation.result
@@ -96,9 +80,9 @@ def _switch(observation, flag_fields, off_state):
         return ACTIVE
     fields = observation.fields
     for name in flag_fields:
-        flag = _flag(fields.get(name))
-        if flag is not None:
-            return ACTIVE if flag else off_state
+        on = flag(fields.get(name))
+        if on is not None:
+            return ACTIVE if on else off_state
     return ACTIVE
 
 
@@ -113,7 +97,7 @@ DATA_FLOW = register(Category(
 
 def restore_state(observation):
     fields = observation.fields
-    if str(fields.get("decision", "")).lower() == "deny" or _flag(fields.get("deletion_block")):
+    if str(fields.get("decision", "")).lower() == "deny" or flag(fields.get("deletion_block")):
         return BLOCKED
     return _switch(observation, ("restore_allowed", "eligible"), BLOCKED)
 
@@ -141,7 +125,7 @@ CACHE_ENTRY = register(Category(
     name="CACHE_ENTRY", system_id="cache_service", resource_prefix="cache_",
     treatment=treatments.DELETE, assess=presence))
 
-# Conditional rules decided from the record's own fields (see conditional.py).
+# Conditional rules decided from the Resource's own fields (see conditional.py).
 SUPPORT_MESSAGE = register(Category(
     name="SUPPORT_MESSAGE", system_id="support_platform", resource_prefix="support_",
     treatment=treatments.REDACT, assess=conditional.redaction, decide=conditional.support_treatment))
@@ -154,7 +138,7 @@ EMAIL_DELIVERY_LOG = register(Category(
     name="EMAIL_DELIVERY_LOG", system_id="email_delivery_service", resource_prefix="email_delivery_",
     treatment=treatments.REDACT, assess=conditional.redaction, decide=conditional.redact_treatment))
 
-# Records policy requires to keep (rules 12-13): verified present while the stated
+# Resources policy requires to keep (rules 12-13): verified present while the stated
 # retention period or legal hold runs at the Audit cutoff, deleted once it has ended.
 SECURITY_AUDIT_LOG = register(Category(
     name="SECURITY_AUDIT_LOG", system_id="security_service", resource_prefix="audit_record_",
@@ -163,8 +147,8 @@ LEGAL_HOLD_RECORD = register(Category(
     name="LEGAL_HOLD_RECORD", system_id="legal_service", resource_prefix="legal_hold_",
     treatment=treatments.RETAIN, assess=presence, decide=conditional.retain_treatment))
 
-# The deleted account's identity record (rule_15): an Account tombstone keeping only
-# the user_id while retained records still reference it, otherwise deleted.
+# The deleted account's identity Resource (rule_15): an Account tombstone keeping only
+# the user_id while retained Resources still reference it, otherwise deleted.
 ACCOUNT_TOMBSTONE = register(Category(
     name="ACCOUNT_TOMBSTONE", system_id="identity_service", resource_prefix="tombstone_",
     treatment=treatments.REDACT, assess=conditional.redaction, decide=conditional.tombstone_treatment,

@@ -14,7 +14,7 @@ citable covering Snapshot that lacks the row. When no citable file exists the
 citation is empty and the caller decides (see ``pipeline.Auditor.audit``).
 """
 
-from .evidence import ABSENT
+from .states import ABSENT
 from .state import latest_by, reconstruct
 
 

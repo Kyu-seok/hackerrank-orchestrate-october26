@@ -54,10 +54,7 @@ def main(argv=None):
         how = "extracted" if len(llm.read_usage(gateway.cache_dir)) > before else "cached"
         print("%s %s: %d record(s) [%s]" % (file_id, path.name, len(extraction.get("records", [])), how))
 
-    calls = llm.read_usage(gateway.cache_dir)[calls_before:]
-    if calls:
-        print("model calls this run: %d, input tokens %d, output tokens %d" % (
-            len(calls), sum(c["input_tokens"] for c in calls), sum(c["output_tokens"] for c in calls)))
+    llm.print_calls_since(calls_before, gateway.cache_dir)
     if missing:
         print("error: %d file(s) have no cached extraction and the gateway is offline: %s. "
               "Set %s (environment or an uncommitted .env) and rerun."

@@ -3,8 +3,7 @@
 import re
 from dataclasses import dataclass, field
 
-PRESENT = "PRESENT"
-ABSENT = "ABSENT"
+from ..states import ABSENT, PRESENT  # noqa: F401  (re-exported for the loaders)
 
 _EMAIL = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
 _USER_ID = re.compile(r"\buser_\d+\b")

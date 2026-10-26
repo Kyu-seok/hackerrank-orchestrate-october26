@@ -58,7 +58,7 @@ class Attributor:
         self.store = store
         self.actions = action_activities(dataset)
         self.links = link_activities(dataset)
-        self.owned_by = self._owners()
+        self.subjects_of = self._owners()
         self._plan = self._resolve(requests)
 
     def resources(self, request):
@@ -68,17 +68,17 @@ class Attributor:
 
     # -- identifier ownership --------------------------------------------------
     def _owners(self):
-        """(system_id, resource_id) -> user_ids any identifier ties it to (at any time)."""
+        """(system_id, resource_id) -> user_ids of the Subjects any identifier ties it to (at any time)."""
         owners = identifier_owners(self.dataset)
         owned = {}
         for obs in self.store.observations:
             if categories.category_for(obs.system_id, obs.resource_id) is None:
                 continue
-            users = set()
+            subjects = set()
             for token in obs.tokens:
-                users |= owners.get(token, set())
-            if users:
-                owned.setdefault((obs.system_id, obs.resource_id), set()).update(users)
+                subjects |= owners.get(token, set())
+            if subjects:
+                owned.setdefault((obs.system_id, obs.resource_id), set()).update(subjects)
         return owned
 
     def _identifier_matches(self, request, subject):
@@ -107,8 +107,8 @@ class Attributor:
 
     def _co_located(self, category, resource_id, files, audit_at):
         """Is the Resource observed in an Evidence file that also holds a Subject-linked record?"""
-        return any(o.evidence_id in files and o.observed_at <= audit_at
-                   for o in self.store.for_resource(category.system_id, resource_id))
+        return any(o.evidence_id in files
+                   for o in self.store.observed_by(category.system_id, resource_id, audit_at))
 
     # -- workflow matches -------------------------------------------------------
     def _workflow_candidates(self, category, request, subject):
@@ -118,7 +118,7 @@ class Attributor:
         out = {}
         for act in self.actions:
             if lo <= act["event_time"] <= hi and category.owns(act["target_system"], act["resource_id"]):
-                others = self.owned_by.get((category.system_id, act["resource_id"]), set()) - {subject.user_id}
+                others = self.subjects_of.get((category.system_id, act["resource_id"]), set()) - {subject.user_id}
                 if not others:
                     out.setdefault(act["resource_id"], set()).add(act["reported_result"])
         return out
@@ -151,15 +151,15 @@ class Attributor:
                 agree = {rid for rid in cands
                          if RESULT_FOR_STATUS.get(request.reported_status) in results[rid]}
                 options[case_id] = (near & agree, near, agree, cands)
-            user_of = {case_id: subjects[case_id][1].user_id for case_id in options}
+            subject_of = {case_id: subjects[case_id][1].user_id for case_id in options}
             if category not in ALWAYS_IN_SCOPE:
-                for case_id, rids in _unique_owner(options, user_of).items():
+                for case_id, rids in _unique_owner(options, subject_of).items():
                     plan[case_id] |= {(category, rid) for rid in rids}
                 continue
             first_action = {}
             for act in self.actions:  # sorted by time
                 first_action.setdefault(act["resource_id"], act["event_time"])
-            settled = _settle(options, user_of,
+            settled = _settle(options, subject_of,
                               case_order=lambda c: (subjects[c][0].requested_at, c),
                               resource_order=lambda rid: (first_action.get(rid, ""), rid))
             for case_id, rids in settled.items():
@@ -167,23 +167,23 @@ class Attributor:
         return plan
 
 
-def _unique_owner(options, user_of):
+def _unique_owner(options, subject_of):
     """For an optional category: a Resource goes to a case only when every case
     that could own it belongs to the same Subject (no guessing between people)."""
-    users = {}
+    subjects = {}
     for case_id, tiers in options.items():
         for rid in tiers[-1]:  # the last tier holds every candidate
-            users.setdefault(rid, set()).add(user_of[case_id])
+            subjects.setdefault(rid, set()).add(subject_of[case_id])
     out = {}
     for case_id, tiers in options.items():
         cands = tiers[-1]
-        mine = {rid for rid in cands if users[rid] == {user_of[case_id]}}
+        mine = {rid for rid in cands if subjects[rid] == {subject_of[case_id]}}
         if mine:
             out[case_id] = mine
     return out
 
 
-def _settle(options, user_of, case_order, resource_order):
+def _settle(options, subject_of, case_order, resource_order):
     """Give each open case one workflow Resource.
 
     A case left with exactly one candidate takes it away from cases of other
@@ -208,7 +208,7 @@ def _settle(options, user_of, case_order, resource_order):
     def claim(case_id, rid):
         changed = False
         for other in options:
-            if user_of[other] != user_of[case_id] and rid not in taken_from[other]:
+            if subject_of[other] != subject_of[case_id] and rid not in taken_from[other]:
                 taken_from[other].add(rid)
                 changed = True
         return changed

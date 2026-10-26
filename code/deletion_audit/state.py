@@ -9,7 +9,7 @@ neither, the state is unknown and treated as PRESENT.
 
 from collections import namedtuple
 
-from .evidence import ABSENT, PRESENT
+from .states import ABSENT, PRESENT
 
 # basis: "observation" | "omission" | "unknown"; proof: the Observation or Snapshot used.
 Resolution = namedtuple("Resolution", "state basis proof")

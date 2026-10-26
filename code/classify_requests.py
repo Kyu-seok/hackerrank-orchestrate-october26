@@ -58,10 +58,7 @@ def main(argv=None):
     print("%d request(s), %d distinct text(s): %d new decision(s), %d already cached"
           % (len(requests), len(texts), written, len(texts) - written))
     print("not deletion requests (%d): %s" % (len(not_deletion), ", ".join(not_deletion) or "-"))
-    calls = llm.read_usage(gateway.cache_dir)[calls_before:]
-    if calls:
-        print("model calls this run: %d, input tokens %d, output tokens %d" % (
-            len(calls), sum(c["input_tokens"] for c in calls), sum(c["output_tokens"] for c in calls)))
+    llm.print_calls_since(calls_before, gateway.cache_dir)
     return 0
 
 

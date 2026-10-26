@@ -436,6 +436,8 @@ class FullRun(unittest.TestCase):
         self.assertEqual(len(rows), 518)
         for row in rows:
             self.assertEqual(scorer.schema_errors(row["deletion_status"], row["steps_json"]), [], row["case_id"])
+        # LF line endings, so the file on disk is byte-identical to the committed one.
+        self.assertNotIn(b"\r", (REPO_ROOT / "output.csv").read_bytes())
         self.assertEqual(scorer.cutoff_errors(scorer.load_answers(REPO_ROOT / "output.csv"),
                                               DATASET / "deletion_requests.csv"), {})
 

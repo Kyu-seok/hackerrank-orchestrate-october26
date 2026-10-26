@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .dataset import REPO_ROOT
+from .flags import flag
 
 API_KEY_VAR = "ANTHROPIC_API_KEY"
 USAGE_FILE = "usage.jsonl"
@@ -44,6 +45,19 @@ def read_usage(cache_dir=None):
     if not path.exists():
         return []
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def fill_hint(command):
+    """How to fill a missing cache entry, for warnings and errors."""
+    return "Fill the cache once with: %s (%s set)" % (command, API_KEY_VAR)
+
+
+def print_calls_since(calls_before, cache_dir=None):
+    """Print the model calls (count and tokens) recorded after the first ``calls_before`` calls."""
+    calls = read_usage(cache_dir)[calls_before:]
+    if calls:
+        print("model calls this run: %d, input tokens %d, output tokens %d" % (
+            len(calls), sum(c["input_tokens"] for c in calls), sum(c["output_tokens"] for c in calls)))
 
 
 def cache_key(purpose, request):
@@ -117,7 +131,7 @@ class Gateway:
     @property
     def online(self):
         """True when a cache miss may call the model."""
-        if self._offline or _truthy(self._env.get(OFFLINE_VAR)):
+        if self._offline or flag(self._env.get(OFFLINE_VAR)):
             return False
         return self._api_key() is not None
 
@@ -163,10 +177,6 @@ class Gateway:
     def _api_key(self):
         value = self._env.get(API_KEY_VAR) or _dotenv_value(self._dotenv_path, API_KEY_VAR)
         return (value or "").strip() or None
-
-
-def _truthy(value):
-    return str(value or "").strip().lower() in ("1", "true", "yes", "on")
 
 
 def _dotenv_value(path, name):

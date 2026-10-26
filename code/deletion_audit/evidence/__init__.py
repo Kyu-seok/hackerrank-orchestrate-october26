@@ -38,9 +38,9 @@ def load_evidence(dataset):
         except llm.CacheMiss:
             not_extracted.append(file_id)
     if not_extracted:
-        print("warning: %d PDF/image evidence file(s) have no cached extraction and were skipped (%s). "
-              "Fill the cache once with: python3 code/extract_evidence.py (ANTHROPIC_API_KEY set)"
-              % (len(not_extracted), ", ".join(not_extracted)), file=sys.stderr)
+        print("warning: %d PDF/image evidence file(s) have no cached extraction and were skipped (%s). %s"
+              % (len(not_extracted), ", ".join(not_extracted), llm.fill_hint("python3 code/extract_evidence.py")),
+              file=sys.stderr)
     _resolve_aliases(store, dataset)
     return store
 
