@@ -1,0 +1,99 @@
+{
+  "model": "claude-sonnet-5-5",
+  "purpose": "evidence_extraction",
+  "result": {
+    "document_kind": "customer account admin console (customer profile overview)",
+    "records": [
+      {
+        "email": "haruka.s1838@zoho.com",
+        "email_hash": null,
+        "file_name": null,
+        "name": "Haruka Sato",
+        "notes": "Default address 2-18-4 Kichijoji, Musashino, Tokyo 180-0004; member since 12 Jan 2024; market JP; signup channel mobile_app.",
+        "order_id": null,
+        "phone": "+81 90 7610 2507",
+        "record_type": "customer_profile",
+        "related_references": [
+          "user_11",
+          "CS-8538",
+          "support_9538",
+          "ORD-20265762",
+          "ORD-20265518"
+        ],
+        "resource_id": "account_5762",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "Silver",
+        "system_id": "account_service",
+        "ticket_id": null,
+        "user_id": "user_11"
+      },
+      {
+        "email": null,
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Ceramic coffee set, qty 1, JPY 8,900, ordered 12 Sep 2026.",
+        "order_id": "ORD-20265762",
+        "phone": null,
+        "record_type": "order",
+        "related_references": [
+          "account_5762"
+        ],
+        "resource_id": "",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "Delivered · 18 Sep",
+        "system_id": "account_service",
+        "ticket_id": null,
+        "user_id": null
+      },
+      {
+        "email": null,
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Travel backpack, qty 1, JPY 12,400, ordered 28 Aug 2026.",
+        "order_id": "ORD-20265518",
+        "phone": null,
+        "record_type": "order",
+        "related_references": [
+          "account_5762"
+        ],
+        "resource_id": "",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "Returned · 03 Sep",
+        "system_id": "account_service",
+        "ticket_id": null,
+        "user_id": null
+      },
+      {
+        "email": null,
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Listed under Support in customer details; created 28 Aug, customer replied 24 Sep.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "support_ticket",
+        "related_references": [
+          "CS-8538",
+          "account_5762",
+          "user_11"
+        ],
+        "resource_id": "support_9538",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": null,
+        "system_id": "support_platform",
+        "ticket_id": "CS-8538",
+        "user_id": null
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 5725,
+    "output_tokens": 779
+  }
+}

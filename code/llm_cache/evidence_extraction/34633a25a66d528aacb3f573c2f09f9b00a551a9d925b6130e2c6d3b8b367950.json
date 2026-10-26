@@ -1,0 +1,49 @@
+{
+  "model": "claude-sonnet-5-5",
+  "purpose": "evidence_extraction",
+  "result": {
+    "document_kind": "search console customer search results (customer_directory_v3 index inspector)",
+    "records": [
+      {
+        "email": "g.silva76@gmail.com",
+        "email_hash": null,
+        "file_name": null,
+        "name": "Gabriel Silva",
+        "notes": "Indexed at 2026-09-01T05:58:21Z in customer_directory_v3 (prod-eu); score 9.84.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "search_document",
+        "related_references": [],
+        "resource_id": "search_428",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": null,
+        "system_id": "search_service",
+        "ticket_id": null,
+        "user_id": "user_13"
+      },
+      {
+        "email": "g.silva76.jr@gmail.com",
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Different email from g.silva76@gmail.com; last indexed 05:55:03 UTC; score 4.12.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "search_document",
+        "related_references": [],
+        "resource_id": "search_1874",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": null,
+        "system_id": "search_service",
+        "ticket_id": null,
+        "user_id": null
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 5531,
+    "output_tokens": 386
+  }
+}

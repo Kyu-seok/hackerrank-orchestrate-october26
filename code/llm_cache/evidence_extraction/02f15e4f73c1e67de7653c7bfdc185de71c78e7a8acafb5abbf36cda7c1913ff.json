@@ -1,0 +1,33 @@
+{
+  "model": "claude-sonnet-5-5",
+  "purpose": "evidence_extraction",
+  "result": {
+    "document_kind": "compliance journal signed record extract",
+    "records": [
+      {
+        "email": null,
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Account closure recorded by automated account workflow on 2026-08-25T04:03:00Z; stored in compliance-ledger, integrity seal valid.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "security_audit_record",
+        "related_references": [
+          "CJX-20260905-0630"
+        ],
+        "resource_id": "audit_record_003",
+        "retention_until": "2027-08-25T04:03:00Z",
+        "state": "PRESENT",
+        "status": null,
+        "system_id": "security_service",
+        "ticket_id": null,
+        "user_id": "user_03"
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 4800,
+    "output_tokens": 226
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5-5",
+  "purpose": "evidence_extraction",
+  "result": {
+    "document_kind": "marketing platform audience operations profile console",
+    "records": [
+      {
+        "email": "sj.park@naver.com",
+        "email_hash": null,
+        "file_name": null,
+        "name": "Soo-jin Park",
+        "notes": "Email opt-in Yes, SMS opt-in No; member of Returning customers — East Asia audience; last campaign Autumn offers.",
+        "order_id": null,
+        "phone": "+82 10-5837-9451",
+        "record_type": "marketing_profile",
+        "related_references": [],
+        "resource_id": "marketing_001",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "Live",
+        "system_id": "marketing_platform",
+        "ticket_id": null,
+        "user_id": null
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 4710,
+    "output_tokens": 224
+  }
+}
