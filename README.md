@@ -120,7 +120,8 @@ The scorer reports these measures:
 - step precision, recall and F1;
 - positional field accuracy;
 - exact sequence accuracy;
-- output-contract and ordering errors.
+- output-contract and ordering errors;
+- with `--requests REQUESTS_CSV`, steps citing evidence captured after the case's `audit_at` (no labels needed, so it also runs on the full output: `python3 code/evaluation/main.py output.csv --gold output.csv --requests dataset/deletion_requests.csv`).
 
 Results, our evaluation cases, failures found and improvements made are in `code/evaluation/evaluation_report.md`. Token use and estimated cost are in `code/evaluation/usage_report.md`.
 

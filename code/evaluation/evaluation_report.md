@@ -11,7 +11,9 @@ cost are in [`usage_report.md`](usage_report.md).
     resource_id, state, evidence_id)`);
   - positional field accuracy (gold and predicted steps aligned by index, each field scored);
   - sequence accuracy (the whole ordered `steps_json` matches exactly, and so does the status);
-  - output-contract and ordering checks.
+  - output-contract and ordering checks;
+  - with `--requests`, an audit-cutoff check that needs no labels: no step may cite a file, activity
+    or audit entry captured after the case's `audit_at`.
 - **Labeled data:** the 32 public samples (`dataset/sample_deletion_requests.csv` scored against
   `dataset/sample_output.csv`) and our own evaluation cases under `code/evaluation/cases/`. The
   518 evaluation requests have no labels, so they get only the contract checks.
@@ -24,6 +26,7 @@ Commands:
 DELETION_AUDIT_OFFLINE=1 python3 code/main.py --strict
 DELETION_AUDIT_OFFLINE=1 python3 code/main.py --strict --requests dataset/sample_deletion_requests.csv --output /tmp/samples.csv
 python3 code/evaluation/main.py /tmp/samples.csv --verbose --markdown /tmp/samples.md
+python3 code/evaluation/main.py output.csv --gold output.csv --requests dataset/deletion_requests.csv
 python3 -m unittest discover -s code/evaluation -p "test_*.py"
 ```
 
@@ -33,8 +36,9 @@ python3 -m unittest discover -s code/evaluation -p "test_*.py"
 | --- | --- |
 | Final full run (`python3 code/main.py --strict`, offline) | 518 rows, sorted by `case_id`, header `case_id,deletion_status,steps_json` |
 | Rows with scorer contract or ordering errors (all 518) | **0** |
+| Steps citing evidence captured after `audit_at` (all 518) | **0** |
 | Status distribution (518) | INCOMPLETE 354, COMPLETE 154, NOT_APPLICABLE 10 |
-| Steps written (518) | 3,162 (FINDING 722, REMEDIATION 722, VERIFICATION 1,718) |
+| Steps written (518) | 3,161 (FINDING 722, REMEDIATION 722, VERIFICATION 1,717) |
 | Sample status accuracy (32) | **100.0%** |
 | Sample sequence accuracy (32) | **65.6%** (21 of 32 exact) |
 | Sample step F1 (32) | **95.5%** |
@@ -119,6 +123,13 @@ steps and add 4 extra steps.
   sample, but we have no labels for the 518 requests.
 - The deletion-request decision and the PDF/image readings are the only model outputs (ADR 0001).
   Everything else is deterministic: a rerun from the cache reproduces `output.csv` byte for byte.
+  The file is written with LF line endings, the same bytes the repository stores, and the full-run
+  test checks this.
+- Two Resources are shown only by a bundle exported after the case's `audit_at` (deviation 11):
+  - `case_126`: `account_8819` is in `evidence_12`, exported 2026-08-19. Its finding cites the
+    deletion worker's failed delete, `activity_3114`.
+  - `case_532`: `account_3146` is shown absent only by `evidence_49`, exported 2026-01-31. That
+    COMPLETE case leaves out its account verification.
 
 ## Deviations from the spec (issue #1)
 
@@ -149,8 +160,37 @@ These decisions follow the labeled samples where they contradict the spec's stor
 8. **Deletion-verification requests count as deletion requests.** A request to verify or confirm
    one's own deletion counts as a deletion request (samples `case_27` and `case_28`). The
    classification prompt says so explicitly.
-9. **More evaluation cases.** The spec asked for four evaluation cases; there are seven.
-10. **Report location.** The reports are in `code/evaluation/` rather than `evaluation/`
+9. **Joint workflow attribution across request files.** The pipeline resolves workflow attribution
+   (deviation 5) over every request it knows: the samples, the full request set and the input file.
+   Requests from both sets share `reported_at` windows and compete for the same deleted accounts.
+   So a case gets the same answer whichever file it is run from. If only the input file were used,
+   sample sequence accuracy would fall from 65.6% to 59.4%, and 7 rows of the full run would change.
+10. **More evaluation cases.** The spec asked for four evaluation cases; there are seven.
+11. **No citable proof.** Some Resources are shown only by a bundle whose manifest `captured_at` is
+    after `audit_at`. Their state still comes from the inner snapshot's own time (deviation 1). The
+    samples need this: `case_09`, `case_23`, `case_24`, `case_29` and `case_30` verify retained audit
+    records seen only in such a bundle. They are never cited, though (AGENTS.md §6.6):
+    - A finding cites the deletion worker's latest unsuccessful Action activity on the Resource
+      before the cutoff instead. This is a participant-visible `activity_id`, and its Claim agrees
+      with the finding.
+    - A COMPLETE case leaves out a verification that has nothing citable. AGENTS.md §6.3 says a
+      COMPLETE case includes "only evidence-backed verification steps".
+    - Sample outputs are unchanged. In the full run, only `case_126` and `case_532` change.
+12. **A legal hold with no stated end stays RETAIN.** Rule_13 retains a record while "a supplied
+    legal hold is active". The pipeline treats a hold that states no end date as active. The
+    participant data has no source of hold status to check this against:
+    - The legal retention register PDF lists only orders with end dates (all in 2033). It names no
+      `legal_hold_*` Resource.
+    - The only other signals are RETAIN_RECORD Claims.
+    Two holds in the full data state no end: `legal_hold_4961` and `legal_hold_8049`.
+13. **Key from `.env`.** The gateway reads `ANTHROPIC_API_KEY` from the environment first, then from
+    an uncommitted `.env` at the repo root. AGENTS.md §4.4 allows this. `DELETION_AUDIT_DOTENV`
+    points the gateway at another file, or at none.
+14. **A missing classification only warns by default.** A request whose text has no cached
+    deletion-request decision is audited as a deletion request, and one stderr warning names it.
+    `--strict` fails the run instead. The submitted `output.csv` comes from a `--strict` run, so
+    every request in it was classified.
+15. **Report location.** The reports are in `code/evaluation/` rather than `evaluation/`
     (AGENTS.md §6.8), because the README is newer and its zip command only bundles `README.md` and `code/`.
 
 ## Failures found and improvements made
@@ -194,5 +234,12 @@ each was fixed:
 - **Classification misread.** The first Haiku run marked `case_27` and `case_28` ("verify my
   deletion") as not deletion requests. The prompt was fixed, the decisions were cleared and every
   text was reclassified. The discarded run's tokens are listed in `usage_report.md`.
+- **Post-cutoff citation (code review).** The citation's last resort cited the deciding record's own
+  file even when that file was exported after `audit_at` (`case_126` cited `evidence_12`, `case_532`
+  cited `evidence_49`). Citations now come only from files exported by the cutoff (deviation 11).
+  The scorer's `--requests` check and the full-run test now guard this. Sample scores did not
+  change.
+- **Line endings (code review).** The CSV writer used CRLF, so `output.csv` on disk differed from
+  the LF copy the repository stores. It now writes LF.
 - **Test isolation.** Two "no API key" CLI tests read a key from the repo-root `.env` and reached the
   real API. The gateway now honours `DELETION_AUDIT_DOTENV`, and those tests point it at a missing file.
