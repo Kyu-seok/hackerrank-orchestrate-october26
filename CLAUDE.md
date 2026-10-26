@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Claude Code notes (supplements AGENTS.md)
 
 - **Logging is mandatory.** Every turn appends to `log.txt` at the repo root (AGENTS.md §2, §5). In entries use `tool=Claude Code` and the exact runtime model ID from the session (e.g. `claude-opus-5-5[1m]`), never a family name. Sub-agents append to the same file with `parent_agent=` set.
-- **Current state:** `code/main.py` is an empty stub. There is no build, lint, or test tooling yet; when you add some, document the commands here and in `README.md`.
+- **Current state:** `code/main.py [--requests CSV] [--output CSV]` runs the pipeline in `code/deletion_audit/` (evidence loaders in `evidence/`, category registry in `categories.py`). Tests: `python3 -m unittest discover -s code/evaluation -p "test_*.py"` (end-to-end: CLI + scorer on the samples and on each `code/evaluation/cases/*/` request/answer pair; the full-run test rewrites the root `output.csv`).
 - **Scorer:** `python3 code/evaluation/main.py PRED_CSV [--gold GOLD_CSV] [--verbose] [--markdown OUT_MD]` scores predictions against `dataset/sample_output.csv` (status, step P/R/F1, positional field accuracy, exact sequence, schema/order checks). Standard library only, Python 3.9+.
 - **Run:** `python3 code/main.py` from the repo root. It must read `dataset/` and write `output.csv` to the **repo root**, not `dataset/output.csv`, which is the blank template. Resolve paths relative to the repo root.
 - **Ground truth for development:** `dataset/sample_deletion_requests.csv` (32 cases) and `dataset/sample_output.csv` are the only labeled data. Evaluate against them in `code/evaluation/`. Nothing outside `dataset/` may be used for predictions.

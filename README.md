@@ -37,6 +37,16 @@ Run the starter Python entry point with:
 python3 code/main.py
 ```
 
+Options: `--requests REQUESTS_CSV` (default `dataset/deletion_requests.csv`) and
+`--output OUTPUT_CSV` (default `output.csv` at the repo root). Python 3.9+, standard library only.
+Evaluate on the labeled samples and run the end-to-end tests with:
+
+```bash
+python3 code/main.py --requests dataset/sample_deletion_requests.csv --output /tmp/samples.csv
+python3 code/evaluation/main.py /tmp/samples.csv --verbose
+python3 -m unittest discover -s code/evaluation -p "test_*.py"
+```
+
 The blank template at `dataset/output.csv` is provided as a reference. Your final generated file for submission must be the root-level `output.csv`.
 
 
