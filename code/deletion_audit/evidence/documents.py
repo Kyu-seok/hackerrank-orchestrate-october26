@@ -87,12 +87,14 @@ def load(file_id, path, file_captured_at, gateway=None):
     extraction = extract(gateway, path)
     store = EvidenceStore()
     for rec in extraction.get("records", []):
-        if not rec.get("resource_id") or not rec.get("system_id"):
+        if not rec.get("system_id"):
             continue
+        # A record the document shows without its resource_id keeps resource_id "": the
+        # store resolves it through a link-identity alias or drops it (see evidence.load_evidence).
         fields = {k: v for k, v in rec.items() if v not in (None, "", [])}
         store.observations.append(Observation(
             evidence_id=file_id, observed_at=file_captured_at, file_captured_at=file_captured_at,
-            system_id=rec["system_id"], resource_id=rec["resource_id"],
+            system_id=rec["system_id"], resource_id=rec.get("resource_id") or "",
             presence=ABSENT if rec.get("state") == ABSENT else PRESENT,
             fields=fields, source="extraction:%s" % rec.get("record_type", "")))
     return store

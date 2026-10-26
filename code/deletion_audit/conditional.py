@@ -6,6 +6,10 @@
 - ANALYTICS_PROFILE / PRODUCT_TELEMETRY (rules 07-08): a record still attributable
   to a user (any identifier, including ``user_id``) is ANONYMIZED.
 - EMAIL_DELIVERY_LOG (rule_11): a log holding a user email is REDACTED.
+- SECURITY_AUDIT_LOG / LEGAL_HOLD_RECORD (rules 12-13): RETAINED while the stated
+  retention period or hold is still running at the Audit cutoff, else DELETED.
+- ACCOUNT_TOMBSTONE (rule_15): REDACTED to the bare ``user_id`` while the case
+  retains records referencing it, else DELETED.
 
 ``redaction`` and ``anonymization`` read a Resource's state from one Observation.
 ``support_treatment``, ``anonymize_treatment`` and ``redact_treatment`` pick the Required treatment
@@ -98,17 +102,62 @@ def _decide(default, observations, state, worker_action):
     return default
 
 
-def support_treatment(observations, state, worker_action):
+def support_treatment(observations, state, worker_action, **_case):
     """rule_06 for an attachment, rule_05 for a conversation with shared context."""
     default = treatments.DELETE if any(is_attachment(o) for o in observations) else treatments.REDACT
     return _decide(default, observations, state, worker_action)
 
 
-def anonymize_treatment(observations, state, worker_action):
+def anonymize_treatment(observations, state, worker_action, **_case):
     """rules 07/08: analytics profiles and product telemetry still attributable to a user."""
     return _decide(treatments.ANONYMIZE, observations, state, worker_action)
 
 
-def redact_treatment(observations, state, worker_action):
+def redact_treatment(observations, state, worker_action, **_case):
     """rule_11: email delivery logs holding a user email."""
     return _decide(treatments.REDACT, observations, state, worker_action)
+
+
+# -- Retention (rule_12, rule_13) and Account tombstones (rule_15) --------------
+# Fields stating until when a record must be kept: a security audit record's
+# ``retention_until``, a legal hold's ``retained_until`` (the retention PDFs are
+# extracted into ``retention_until`` as well).
+RETENTION_KEYS = ("retention_until", "retained_until")
+
+
+def _end_of(value):
+    """A retention end as a comparable ``...Z`` timestamp; a bare date lasts the whole day."""
+    text = str(value).strip()
+    return text + "T23:59:59Z" if len(text) == 10 else text
+
+
+def retained_until(observations):
+    """Retention end stated by the latest Observation that states one, or None."""
+    stated = [(o.observed_at, o.evidence_id, _end_of(o.fields[k])) for o in observations
+              for k in RETENTION_KEYS if _has_value(o.fields.get(k))]
+    return max(stated)[2] if stated else None
+
+
+def retain_treatment(observations, state, worker_action, audit_at="", **_case):
+    """rule_12 / rule_13: RETAIN while the retention period or legal hold still runs at
+    the Audit cutoff; once it has ended the condition no longer holds and the record
+    falls back to DELETE. A record that states no end is taken to be held (every
+    retained record in the samples is verified present). A retained record that is
+    already gone can only be verified absent."""
+    if state == ABSENT:
+        return treatments.DELETE
+    until = retained_until(observations)
+    if until is not None and until < audit_at:
+        return treatments.DELETE
+    return treatments.RETAIN
+
+
+def tombstone_treatment(observations, state, worker_action, retained=False, **_case):
+    """rule_15: the identity record becomes an Account tombstone (REDACT: only the stable
+    ``user_id`` stays) while retained records still reference it: the case keeps one, or
+    the record itself lists the records linked to it (a reference registry entry); with
+    nothing left to resolve, the identity record is deleted."""
+    references = any(o.fields.get("related_references") for o in observations)
+    if state == ABSENT or not (retained or references):
+        return treatments.DELETE
+    return treatments.REDACT

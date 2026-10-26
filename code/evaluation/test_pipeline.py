@@ -197,6 +197,41 @@ class SampleRun(unittest.TestCase):
                 mismatched.append(row["case_id"])
         self.assertEqual(mismatched, [])
 
+    def test_security_audit_record_within_retention_is_verified_present(self):
+        # evidence_03 handover (10-01T12:00 = audit_at): audit_record_9394 FOUND for user_32,
+        # retained under rule_12, so it is only verified present, never deleted.
+        self.assertEqual(self.system_steps("case_11", "security_service"), [
+            ("VERIFICATION", "VERIFY_RECORD_PRESENT", "PRESENT", "audit_record_9394", "")])
+
+    def test_retained_audit_record_in_complete_case_cites_its_evidence(self):
+        # evidence_92 service export holds audit_record_3737 (subject user_21, retention 2031+).
+        self.assertEqual(steps_for(self.rows, "case_21")[0], "COMPLETE")
+        self.assertEqual(self.system_steps("case_21", "security_service"), [
+            ("VERIFICATION", "VERIFY_RECORD_PRESENT", "PRESENT", "audit_record_3737", "evidence_92")])
+
+    def test_security_audit_steps_match_labeled_samples(self):
+        """Every sample's security_service steps match the answers exactly.
+
+        Not derivable: audit_record_6645 (case_18) and audit_record_5569 (case_20)
+        appear nowhere in participant data.
+        """
+        known_gaps = {"case_18", "case_20"}
+        self.assertEqual(sorted(set(self.mismatched_cases("security_service")) - known_gaps), [])
+
+    def test_account_tombstone_with_identifiers_is_redacted_and_verified(self):
+        # evidence_51: tombstone_9178 (user_542) still carries name, email, phone and hash while
+        # audit_record_7068 is retained, so the tombstone keeps only the user_id (rule_15).
+        status, steps = steps_for(self.rows, "case_32")
+        self.assertEqual(status, "INCOMPLETE")
+        self.assertEqual(self.system_steps("case_32", "identity_service"), [
+            ("FINDING", "REPORT_EXPOSED_PII", "PRESENT", "tombstone_9178", "evidence_51"),
+            ("REMEDIATION", "REDACT_RECORD", "REDACTED", "tombstone_9178", ""),
+            ("VERIFICATION", "VERIFY_RECORD_REDACTED", "REDACTED", "tombstone_9178", "")])
+
+    def test_identity_steps_match_labeled_samples(self):
+        # case_31: tombstone_440 already redacted (evidence_51) -> verified only.
+        self.assertEqual(self.mismatched_cases("identity_service"), [])
+
 
 def _system_steps(steps, system_id):
     return [(s["phase"], s["operation"], s["resource_id"], s["evidence_id"])
@@ -288,11 +323,7 @@ class EvaluationCases(unittest.TestCase):
     # Answer-key steps a not-yet-merged ticket owns: {case folder: {(phase, operation,
     # system_id, resource_id, state, evidence_id)}}. The case must miss exactly these and
     # nothing else; delete the entry when the owning ticket lands (the test then fails).
-    PENDING = {
-        # Retained security audit records: retention ticket (#8).
-        "sync_recreated_deleted_data": {
-            ("VERIFICATION", "VERIFY_RECORD_PRESENT", "security_service", "audit_record_7301", "PRESENT", "")},
-    }
+    PENDING = {}
 
     def assert_case_scores_perfectly(self, case_dir):
         with tempfile.TemporaryDirectory() as tmp:
@@ -323,8 +354,22 @@ class EvaluationCases(unittest.TestCase):
         self.assert_case_scores_perfectly(CASES / "email_changed_before_request")
 
     def test_resource_linked_by_catalog_activity_is_attributed(self):
-        # The account carries no identifier in the case window; only a link-identity activity ties it.
+        # A link-identity activity and the evidence_04 screenshot tie account_5762 to the Subject;
+        # the screenshot (2026-09-26) shows it still live after an older 404.
         self.assert_case_scores_perfectly(CASES / "resource_linked_by_catalog")
+
+    def test_security_audit_record_past_its_retention_period_is_deleted(self):
+        # evidence_55 (extracted PDF) keeps audit_record_003 until 2027-08-25; audited 2027-09-01.
+        self.assert_case_scores_perfectly(CASES / "retention_expired")
+
+    def test_tombstone_known_only_from_a_screenshot_and_its_catalog_alias_is_verified_redacted(self):
+        # evidence_42 shows user_17's retained reference with linked records and no direct
+        # identifiers; activity_4011 names it tombstone_17 (alias user_17).
+        self.assert_case_scores_perfectly(CASES / "tombstone_in_screenshot")
+
+    def test_retained_audit_record_survives_a_sync_recreation_case(self):
+        # audit_record_7301 (evidence_01 rows=1, user_14) is verified present next to the remediation.
+        self.assert_case_scores_perfectly(CASES / "sync_recreated_deleted_data")
 
     def test_request_that_does_not_ask_for_deletion_is_not_applicable(self):
         # The Subject has an active data flow (sample case_15), but asks for an invoice and a

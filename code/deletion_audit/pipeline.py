@@ -3,7 +3,7 @@
 import csv
 import sys
 
-from . import classification, state, steps
+from . import classification, state, steps, treatments
 from .activities import WorkerActions
 from .attribution import Attributor
 from .citation import cite
@@ -41,13 +41,17 @@ class Auditor:
         elif not deletion_requested:
             return steps.NOT_APPLICABLE, []
         assessments = []
-        for category, resource_id in self.attributor.resources(request):
+        # Rules that depend on what the case retains (the Account tombstone) are decided last.
+        in_scope = sorted(self.attributor.resources(request), key=lambda cr: cr[0].after_retained)
+        for category, resource_id in in_scope:
+            retained = any(a.treatment is treatments.RETAIN for a in assessments)
             resolution = state.reconstruct(category, resource_id, self.store, request.audit_at)
             treatment = category.required(
                 [o for o in self.store.for_resource(category.system_id, resource_id)
                  if o.observed_at <= request.audit_at],
                 resolution.state,
-                self.worker_actions.latest_type(category.system_id, resource_id, request.audit_at))
+                self.worker_actions.latest_type(category.system_id, resource_id, request.audit_at),
+                audit_at=request.audit_at, retained=retained)
             assessments.append(steps.Assessment(
                 system_id=category.system_id, resource_id=resource_id, treatment=treatment,
                 compliant=resolution.state == treatment.target,

@@ -20,14 +20,20 @@ class Category:
     resource_prefix: str         # resource_id prefix, e.g. "account_"
     treatment: treatments.Treatment
     assess: Callable             # Observation -> current state (e.g. PRESENT, ABSENT, ANONYMIZED)
-    # Conditional rules: (observations, state, worker action type) -> Required treatment.
+    # Conditional rules: (observations, state, worker action type, **case) -> Required treatment,
+    # where ``case`` holds ``audit_at`` and ``retained`` (see ``required``).
     decide: Optional[Callable] = None
+    # Decided after the case's other Resources: its rule depends on what the case retains.
+    after_retained: bool = False
 
-    def required(self, observations, state, worker_action=None):
-        """Required treatment for one Resource (the fixed ``treatment`` unless the rule is conditional)."""
+    def required(self, observations, state, worker_action=None, audit_at="", retained=False):
+        """Required treatment for one Resource (the fixed ``treatment`` unless the rule is conditional).
+
+        ``retained``: the case keeps at least one RETAINED Resource referencing the Subject.
+        """
         if self.decide is None:
             return self.treatment
-        return self.decide(observations, state, worker_action)
+        return self.decide(observations, state, worker_action, audit_at=audit_at, retained=retained)
 
     def owns(self, system_id, resource_id):
         return system_id == self.system_id and resource_id.startswith(self.resource_prefix)
@@ -147,3 +153,19 @@ ANALYTICS_PROFILE = register(Category(
 EMAIL_DELIVERY_LOG = register(Category(
     name="EMAIL_DELIVERY_LOG", system_id="email_delivery_service", resource_prefix="email_delivery_",
     treatment=treatments.REDACT, assess=conditional.redaction, decide=conditional.redact_treatment))
+
+# Records policy requires to keep (rules 12-13): verified present while the stated
+# retention period or legal hold runs at the Audit cutoff, deleted once it has ended.
+SECURITY_AUDIT_LOG = register(Category(
+    name="SECURITY_AUDIT_LOG", system_id="security_service", resource_prefix="audit_record_",
+    treatment=treatments.RETAIN, assess=presence, decide=conditional.retain_treatment))
+LEGAL_HOLD_RECORD = register(Category(
+    name="LEGAL_HOLD_RECORD", system_id="legal_service", resource_prefix="legal_hold_",
+    treatment=treatments.RETAIN, assess=presence, decide=conditional.retain_treatment))
+
+# The deleted account's identity record (rule_15): an Account tombstone keeping only
+# the user_id while retained records still reference it, otherwise deleted.
+ACCOUNT_TOMBSTONE = register(Category(
+    name="ACCOUNT_TOMBSTONE", system_id="identity_service", resource_prefix="tombstone_",
+    treatment=treatments.REDACT, assess=conditional.redaction, decide=conditional.tombstone_treatment,
+    after_retained=True))
