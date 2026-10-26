@@ -117,6 +117,90 @@ class SampleRun(unittest.TestCase):
         self.assertEqual(sorted(set(mismatched) - known_gaps), [])
 
 
+def _system_steps(steps, system_id):
+    return [(s["phase"], s["operation"], s["resource_id"], s["evidence_id"])
+            for s in steps if s["system_id"] == system_id]
+
+
+class ConditionalRules(unittest.TestCase):
+    """Rules whose condition is read from the record: support, analytics, email delivery."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.out = Path(cls.tmp.name) / "samples.csv"
+        run_pipeline(DATASET / "sample_deletion_requests.csv", cls.out)
+        cls.rows = read_rows(cls.out)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def test_identifiable_analytics_profile_is_anonymized(self):
+        # evidence_05 still holds analytics_4440 with the Subject's email, phone and hash.
+        status, steps = steps_for(self.rows, "case_22")
+        self.assertEqual(status, "INCOMPLETE")
+        self.assertEqual(_system_steps(steps, "analytics_platform"), [
+            ("FINDING", "REPORT_EXPOSED_PII", "analytics_4440", "evidence_05"),
+            ("REMEDIATION", "ANONYMIZE_RECORD", "analytics_4440", ""),
+            ("VERIFICATION", "VERIFY_RECORD_ANONYMIZED", "analytics_4440", "")])
+
+    def test_identifiable_support_message_is_redacted_not_deleted(self):
+        # evidence_03 handover: support_864 is a SUPPORT_MESSAGE still IDENTIFIABLE.
+        status, steps = steps_for(self.rows, "case_11")
+        self.assertEqual(status, "INCOMPLETE")
+        self.assertEqual(_system_steps(steps, "support_platform"), [
+            ("FINDING", "REPORT_EXPOSED_PII", "support_864", "evidence_03"),
+            ("REMEDIATION", "REDACT_RECORD", "support_864", ""),
+            ("VERIFICATION", "VERIFY_RECORD_REDACTED", "support_864", "")])
+
+    def test_subject_only_support_attachment_is_deleted(self):
+        # evidence_03 handover: support_4218 is a SUPPORT_ATTACHMENT still FOUND.
+        _, steps = steps_for(self.rows, "case_13")
+        self.assertEqual(_system_steps(steps, "support_platform"), [
+            ("FINDING", "REPORT_REMAINING_RECORD", "support_4218", "evidence_03"),
+            ("REMEDIATION", "DELETE_RECORD", "support_4218", ""),
+            ("VERIFICATION", "VERIFY_RECORD_ABSENT", "support_4218", "")])
+
+    def test_already_redacted_support_message_is_only_verified(self):
+        # evidence_92 shows support_4715 with only the user_id reference left.
+        status, steps = steps_for(self.rows, "case_26")
+        self.assertEqual(status, "COMPLETE")
+        self.assertEqual(_system_steps(steps, "support_platform"), [
+            ("VERIFICATION", "VERIFY_RECORD_REDACTED", "support_4715", "evidence_92")])
+
+    def test_already_anonymized_analytics_profile_is_only_verified(self):
+        # analytics_901 carries no identifier; only the case's anonymize Action activity
+        # (no other request's workflow could own it) ties it to the Subject.
+        status, steps = steps_for(self.rows, "case_04")
+        self.assertEqual(status, "COMPLETE")
+        self.assertEqual(_system_steps(steps, "analytics_platform"), [
+            ("VERIFICATION", "VERIFY_RECORD_ANONYMIZED", "analytics_901", "evidence_56")])
+
+    def test_support_and_analytics_steps_match_labeled_samples(self):
+        """Support and analytics steps match the sample answers, except known gaps.
+
+        Owned by other tickets: case_07's support_001 exists only in a PDF
+        (extraction); case_10/12/29/30 reach their records through historical
+        identifiers (identity history). Not derivable without guessing: the
+        anonymized analytics of case_03/21/25/26/27/28 carry no identifier and
+        their anonymize activity falls in a workflow slot shared with other
+        Subjects' cases.
+        """
+        known_gaps = {"case_07", "case_10", "case_12", "case_29", "case_30",
+                      "case_03", "case_21", "case_25", "case_26", "case_27", "case_28"}
+        systems = ("support_platform", "analytics_platform")
+        mismatched = []
+        for row in read_rows(DATASET / "sample_output.csv"):
+            case_id = row["case_id"]
+            want = [s for s in json.loads(row["steps_json"]) if s["system_id"] in systems]
+            got = [s for s in steps_for(self.rows, case_id)[1] if s["system_id"] in systems]
+            strip = lambda ss: [{k: v for k, v in s.items() if k != "step_no"} for s in ss]  # noqa: E731
+            if strip(want) != strip(got):
+                mismatched.append(case_id)
+        self.assertEqual(sorted(set(mismatched) - known_gaps), [])
+
+
 class EvaluationCases(unittest.TestCase):
     """Our own cases: each folder under cases/ holds requests.csv and answers.csv."""
 

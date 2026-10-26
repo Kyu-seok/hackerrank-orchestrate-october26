@@ -25,6 +25,11 @@ WORKFLOW_BEFORE = timedelta(minutes=80)
 WORKFLOW_AFTER = timedelta(minutes=10)
 # Categories that every deletion case covers even without an identifier match.
 ALWAYS_IN_SCOPE = (categories.USER_PROFILE,)
+# Categories a case may cover with no identifier left: an anonymized analytics
+# profile is tied to the case only by the workflow's anonymize Action activity.
+# Unlike the account, a case need not have one, so it is attributed only when a
+# single Subject's case could own it.
+WORKFLOW_SCOPE = ALWAYS_IN_SCOPE + (categories.ANALYTICS_PROFILE,)
 
 _FMT = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -102,7 +107,7 @@ class Attributor:
                 plan[request.case_id], linked_files[request.case_id] = \
                     self._identifier_matches(request, subject)
 
-        for category in ALWAYS_IN_SCOPE:
+        for category in WORKFLOW_SCOPE:
             claimed = {}  # resource_id -> user_ids whose identifier match includes it
             for case_id, found in plan.items():
                 for c, rid in found:
@@ -119,6 +124,10 @@ class Attributor:
                         if self._co_located(category, rid, linked_files[case_id], request.audit_at)}
                 options[case_id] = (cands, near)
             user_of = {case_id: subjects[case_id][1].user_id for case_id in options}
+            if category not in ALWAYS_IN_SCOPE:
+                for case_id, rids in _unique_owner(options, user_of).items():
+                    plan[case_id] |= {(category, rid) for rid in rids}
+                continue
             first_action = {}
             for act in self.actions:  # sorted by time
                 first_action.setdefault(act["resource_id"], act["event_time"])
@@ -128,6 +137,21 @@ class Attributor:
             for case_id, rids in settled.items():
                 plan[case_id] |= {(category, rid) for rid in rids}
         return plan
+
+
+def _unique_owner(options, user_of):
+    """For an optional category: a Resource goes to a case only when every case
+    that could own it belongs to the same Subject (no guessing between people)."""
+    users = {}
+    for case_id, (cands, _) in options.items():
+        for rid in cands:
+            users.setdefault(rid, set()).add(user_of[case_id])
+    out = {}
+    for case_id, (cands, _) in options.items():
+        mine = {rid for rid in cands if users[rid] == {user_of[case_id]}}
+        if mine:
+            out[case_id] = mine
+    return out
 
 
 def _settle(options, user_of, case_order, resource_order):
