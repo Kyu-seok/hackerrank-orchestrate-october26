@@ -1,0 +1,2 @@
+case_id,email,requested_at,reported_status,reported_at,audit_at,request_text
+eval_history_01,javier.r9408@outlook.com,2026-09-15T11:00:00Z,NOT_STARTED,2026-09-16T11:00:00Z,2026-09-26T11:00:00Z,"Please delete my account. I changed my email address earlier this year, so make sure anything stored under my old address is removed too."

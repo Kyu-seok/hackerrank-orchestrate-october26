@@ -98,12 +98,12 @@ class SampleRun(unittest.TestCase):
     def test_account_steps_match_labeled_samples(self):
         """Account steps (phase, operation, resource) match the sample answers.
 
-        Known gaps, owned by later tickets: case_04's account_004 appears nowhere
-        in participant data; case_10/29/30 request with a historical email
-        (identity history); case_23/31/32 share a workflow slot with other cases
-        whose accounts carry no identifiers, so the pick is a guess.
+        Known gaps: case_04's account_004 appears nowhere in participant data;
+        case_23 shares its workflow slot with three other NOT_STARTED cases but
+        only three FAILED account actions exist and none carries an identifier,
+        so its pick is a guess.
         """
-        known_gaps = {"case_04", "case_10", "case_23", "case_29", "case_30", "case_31", "case_32"}
+        known_gaps = {"case_04", "case_23"}
         self.assertEqual(sorted(set(self.mismatched_cases("account_service", ("phase", "operation", "resource_id")))
                                 - known_gaps), [])
 
@@ -127,11 +127,9 @@ class SampleRun(unittest.TestCase):
     def test_search_index_entry_steps_match_labeled_samples(self):
         """Every remaining search entry is reported, deleted and verified absent (rule_03).
 
-        Known gap, owned by identity history (#3): case_29/30 entries carry only
-        the Subject's old email.
+        case_29/30 entries carry only the Subject's old email (identity history).
         """
-        known_gaps = {"case_29", "case_30"}
-        self.assertEqual(sorted(set(self.mismatched_cases("search_service")) - known_gaps), [])
+        self.assertEqual(self.mismatched_cases("search_service"), [])
 
     def test_user_export_steps_match_labeled_samples(self):
         # export_001 (case_08) and export_7364 (case_23): DELETE FAILED Claims, still downloadable.
@@ -184,10 +182,9 @@ class SampleRun(unittest.TestCase):
     def test_flow_and_backup_steps_match_labeled_samples(self):
         """Every sample's integration_service and backup_service steps match the answers exactly.
 
-        Known gap, owned by the identity-history ticket: case_29/30 request with a
-        historical email, and their connectors select that old email.
+        case_29/30 request with a historical email and their connectors select that
+        old email (identity history).
         """
-        known_gaps = {"case_29", "case_30"}
         gold = read_rows(DATASET / "sample_output.csv")
         systems = ("integration_service", "backup_service")
         mismatched = []
@@ -198,7 +195,7 @@ class SampleRun(unittest.TestCase):
                    for s in steps_for(self.rows, row["case_id"])[1] if s["system_id"] in systems]
             if want != got:
                 mismatched.append(row["case_id"])
-        self.assertEqual(sorted(set(mismatched) - known_gaps), [])
+        self.assertEqual(mismatched, [])
 
 
 def _system_steps(steps, system_id):
@@ -264,14 +261,14 @@ class ConditionalRules(unittest.TestCase):
     def test_support_and_analytics_steps_match_labeled_samples(self):
         """Support and analytics steps match the sample answers, except known gaps.
 
-        Owned by other tickets: case_07's support_001 exists only in a PDF
-        (extraction); case_10/12/29/30 reach their records through historical
+        Owned by another ticket: case_07's support_001 exists only in a PDF
+        (extraction). case_10/12/29/30 reach their records through historical
         identifiers (identity history). Not derivable without guessing: the
         anonymized analytics of case_03/21/25/26/27/28 carry no identifier and
         their anonymize activity falls in a workflow slot shared with other
         Subjects' cases.
         """
-        known_gaps = {"case_07", "case_10", "case_12", "case_29", "case_30",
+        known_gaps = {"case_07",
                       "case_03", "case_21", "case_25", "case_26", "case_27", "case_28"}
         systems = ("support_platform", "analytics_platform")
         mismatched = []
@@ -297,25 +294,37 @@ class EvaluationCases(unittest.TestCase):
             ("VERIFICATION", "VERIFY_RECORD_PRESENT", "security_service", "audit_record_7301", "PRESENT", "")},
     }
 
+    def assert_case_scores_perfectly(self, case_dir):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "pred.csv"
+            run_pipeline(case_dir / "requests.csv", out)
+            result = scorer.score(scorer.load_answers(case_dir / "answers.csv"), scorer.load_answers(out))
+            self.assertEqual(result["schema_errors"], {})
+            pending = self.PENDING.get(case_dir.name)
+            if pending is None:
+                self.assertEqual(result["failures"], [])
+                self.assertEqual(result["sequence_accuracy"], 1.0)
+                return
+            self.assertEqual(len(result["failures"]), 1)
+            failure = result["failures"][0]
+            self.assertEqual(failure["gold_status"], failure["pred_status"])
+            self.assertEqual(failure["extra"], [])
+            self.assertEqual(set(failure["missing"]), pending)
+
     def test_every_case_scores_perfectly(self):
         case_dirs = sorted(p for p in CASES.iterdir() if (p / "answers.csv").exists())
         self.assertTrue(case_dirs)
         for case_dir in case_dirs:
-            with self.subTest(case=case_dir.name), tempfile.TemporaryDirectory() as tmp:
-                out = Path(tmp) / "pred.csv"
-                run_pipeline(case_dir / "requests.csv", out)
-                result = scorer.score(scorer.load_answers(case_dir / "answers.csv"), scorer.load_answers(out))
-                self.assertEqual(result["schema_errors"], {})
-                pending = self.PENDING.get(case_dir.name)
-                if pending is None:
-                    self.assertEqual(result["failures"], [])
-                    self.assertEqual(result["sequence_accuracy"], 1.0)
-                    continue
-                self.assertEqual(len(result["failures"]), 1)
-                failure = result["failures"][0]
-                self.assertEqual(failure["gold_status"], failure["pred_status"])
-                self.assertEqual(failure["extra"], [])
-                self.assertEqual(set(failure["missing"]), pending)
+            with self.subTest(case=case_dir.name):
+                self.assert_case_scores_perfectly(case_dir)
+
+    def test_ghost_under_old_email_found_from_current_email(self):
+        # Requested with the current email; only the pre-change email finds the surviving account.
+        self.assert_case_scores_perfectly(CASES / "email_changed_before_request")
+
+    def test_resource_linked_by_catalog_activity_is_attributed(self):
+        # The account carries no identifier in the case window; only a link-identity activity ties it.
+        self.assert_case_scores_perfectly(CASES / "resource_linked_by_catalog")
 
 
 class FullRun(unittest.TestCase):

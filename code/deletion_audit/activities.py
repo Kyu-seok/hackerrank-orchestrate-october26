@@ -32,3 +32,9 @@ class WorkerActions:
     def latest_type(self, system_id, resource_id, audit_at):
         acts = [a for a in self._by_resource.get((system_id, resource_id), ()) if a["event_time"] <= audit_at]
         return acts[-1]["event_type"] if acts else None
+
+
+def link_activities(dataset):
+    """Link-identity activities, sorted by time then id."""
+    acts = [a for a in dataset.activities if a["event_type"] in LINK_TYPES]
+    return sorted(acts, key=lambda a: (a["event_time"], a["activity_id"]))
