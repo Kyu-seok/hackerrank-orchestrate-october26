@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5-5",
+  "purpose": "evidence_extraction",
+  "result": {
+    "document_kind": "analytics platform user profile view",
+    "records": [
+      {
+        "email": "darwish.omar@icloud.com",
+        "email_hash": null,
+        "file_name": null,
+        "name": "Omar Darwish",
+        "notes": "Profile shows 12 sessions, 19 products viewed, 2 completed orders and USD 167.42 revenue over the last 90 days; last activity 13 Jul 2026 14:22 UTC.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "analytics_profile",
+        "related_references": [],
+        "resource_id": "analytics_7438",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": null,
+        "system_id": "analytics_platform",
+        "ticket_id": null,
+        "user_id": "user_20"
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 5662,
+    "output_tokens": 238
+  }
+}

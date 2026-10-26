@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks for the account to be permanently deleted with confirmation afterward.",
+  "request_text": "I no longer use this account and would like it permanently deleted. Please apply the correct treatment to records covered by the request. A short confirmation when the process is complete is sufficient."
+}

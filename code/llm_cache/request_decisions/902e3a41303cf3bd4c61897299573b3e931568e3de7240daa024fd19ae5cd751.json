@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to close the account and remove the profile and personal details.",
+  "request_text": "Hi, I haven’t used this account in years and would like it closed. Please remove the profile and the personal details attached to it."
+}

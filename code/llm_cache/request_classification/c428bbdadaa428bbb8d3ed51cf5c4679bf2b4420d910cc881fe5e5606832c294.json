@@ -1,0 +1,137 @@
+{
+  "model": "claude-haiku-5-5",
+  "purpose": "request_classification",
+  "result": {
+    "decisions": [
+      {
+        "deletion_requested": true,
+        "id": "r1",
+        "reason": "Customer asks to close the account and delete associated personal data, including copies, and confirm completion."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r2",
+        "reason": "Customer asks to close the account and delete personal data linked through current or earlier identifiers, with confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r3",
+        "reason": "Customer asks to close the account and delete associated personal data and records, with notice on completion."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r4",
+        "reason": "Customer asks to close the account and delete associated personal data and records, with confirmation of review."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r5",
+        "reason": "Customer asks to close the account and process personal-data deletion under the standard procedure, with confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r6",
+        "reason": "Customer asks to close the account and delete personal data, reviewing connected identifiers, with notice on completion."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r7",
+        "reason": "Customer asks to close the account and delete or de-identify eligible account data, with confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r8",
+        "reason": "Customer asks to close the account and delete or de-identify eligible account data, with contact if verification is needed."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r9",
+        "reason": "Customer asks to close the account and delete or de-identify eligible account data, with confirmation afterward."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r10",
+        "reason": "Customer asks to delete the account and every copy of the profile and confirm nothing remains."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r11",
+        "reason": "Customer asks to delete the account and remove them from the directory after earlier deletion was incomplete."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r12",
+        "reason": "Customer asks to delete the account and the identity document sent to support."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r13",
+        "reason": "Customer asks to delete the account and remove data stored under an old email address."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r14",
+        "reason": "Customer asks to delete the account, keeping only what the law requires."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r15",
+        "reason": "Customer asks to delete the account, search results pointing to them, and the downloadable archive."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r16",
+        "reason": "Customer asks to erase the account and confirm when done."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r17",
+        "reason": "Customer asks to erase the account linked to the email and apply correct treatment to covered records, with confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r18",
+        "reason": "Customer asks to erase the account linked to the email and apply correct treatment to covered records, with notice on completion."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r19",
+        "reason": "Customer asks to erase the account linked to the email and apply correct treatment to covered records, with confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r20",
+        "reason": "Customer asks to erase the account linked to the email and apply correct treatment to covered records, with confirmation afterward."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r21",
+        "reason": "Customer asks to erase the account linked to the email across covered systems, with notice on completion."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r22",
+        "reason": "Customer asks to erase the account linked to the email across covered systems and confirm the result."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r23",
+        "reason": "Customer asks to erase the account linked to the email across covered systems, with contact if verification is needed."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r24",
+        "reason": "Customer asks to erase the account linked to the email across covered systems, with confirmation afterward."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r25",
+        "reason": "Customer asks to erase the account linked to the email after checking connected records, with notice on completion."
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 2507,
+    "output_tokens": 1316
+  }
+}

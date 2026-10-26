@@ -1,0 +1,2 @@
+case_id,deletion_status,steps_json
+eval_tombstone_01,COMPLETE,"[{""evidence_id"":""evidence_67"",""operation"":""VERIFY_RECORD_ABSENT"",""phase"":""VERIFICATION"",""resource_id"":""account_6523"",""state"":""ABSENT"",""step_no"":1,""system_id"":""account_service""},{""evidence_id"":""evidence_42"",""operation"":""VERIFY_RECORD_REDACTED"",""phase"":""VERIFICATION"",""resource_id"":""tombstone_17"",""state"":""REDACTED"",""step_no"":2,""system_id"":""identity_service""}]"

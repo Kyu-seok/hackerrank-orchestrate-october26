@@ -1,0 +1,189 @@
+"""Write the token usage report from the LLM usage record.
+
+Usage (from the repo root; makes no model calls):
+
+    python3 code/usage_report.py [--cache-dir DIR] [--requests CSV] [--output MD]
+
+Defaults: code/llm_cache/, dataset/deletion_requests.csv and
+code/evaluation/usage_report.md. Every real model call is a line in
+<cache-dir>/usage.jsonl. A call belongs to the final run when its result is
+still in the cache (<cache-dir>/<purpose>/<cache_key>.json), because the
+pipeline reads only those results. A call whose cache entry was removed was
+superseded (for example by a rerun after a prompt fix); it is listed
+separately, never hidden. Same inputs give the same report byte for byte.
+"""
+
+import argparse
+import csv
+import json
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_CACHE = REPO_ROOT / "code" / "llm_cache"
+DEFAULT_REQUESTS = REPO_ROOT / "dataset" / "deletion_requests.csv"
+DEFAULT_OUTPUT = REPO_ROOT / "code" / "evaluation" / "usage_report.md"
+
+# USD per million tokens (input, output): Anthropic first-party standard rates, no batch
+# discount, no prompt caching; Haiku 5.5's rate applies to prompts up to 100K tokens.
+PRICES = {
+    "claude-sonnet-5-5": (2.00, 10.00),
+    "claude-haiku-5-5": (0.10, 0.50),
+}
+PROVIDER = "Anthropic"
+# Why calls were superseded in this project (shown only when there are superseded calls).
+SUPERSEDED_NOTE = (
+    "In this project they are the first `request_classification` run: it classified samples case_27 "
+    "and case_28 (\"verify my deletion\" requests) as not asking for deletion, contradicting the "
+    "labeled answers, so the prompt (`code/deletion_audit/prompts/request_classification.md`) was "
+    "fixed to count verifying one's own deletion as a deletion request, the non-fixture decisions "
+    "were cleared and every text was classified again.")
+
+
+def load_calls(cache_dir):
+    path = Path(cache_dir) / "usage.jsonl"
+    calls = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    for call in calls:
+        if call["model"] not in PRICES:
+            raise SystemExit("error: no price for model %r; add it to PRICES" % call["model"])
+        call["final"] = (Path(cache_dir) / call["purpose"] / (call["cache_key"] + ".json")).exists()
+    return calls
+
+
+def cost(model, input_tokens, output_tokens):
+    price_in, price_out = PRICES[model]
+    return (input_tokens * price_in + output_tokens * price_out) / 1_000_000
+
+
+def totals(calls):
+    """{(model, purpose): [calls, input, output, cost]} in first-seen order."""
+    groups = {}
+    for call in calls:
+        g = groups.setdefault((call["model"], call["purpose"]), [0, 0, 0, 0.0])
+        g[0] += 1
+        g[1] += call["input_tokens"]
+        g[2] += call["output_tokens"]
+        g[3] += cost(call["model"], call["input_tokens"], call["output_tokens"])
+    return groups
+
+
+def usd(value):
+    return "$%.6f" % value
+
+
+def table(calls, overall_label="Overall"):
+    lines = ["| Model | Provider | Purpose | Calls | Input tokens | Output tokens | Total tokens "
+             "| Est. cost (USD) |",
+             "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |"]
+    overall = [0, 0, 0, 0.0]
+    for (model, purpose), (n, inp, out, c) in totals(calls).items():
+        lines.append("| %s | %s | %s | %d | {:,} | {:,} | {:,} | %s |".format(inp, out, inp + out)
+                     % (model, PROVIDER, purpose, n, usd(c)))
+        for i, v in enumerate((n, inp, out, c)):
+            overall[i] += v
+    n, inp, out, c = overall
+    lines.append("| **%s** | | | %d | {:,} | {:,} | {:,} | %s |".format(inp, out, inp + out)
+                 % (overall_label, n, usd(c)))
+    return lines, overall
+
+
+def window(calls):
+    times = sorted(c["recorded_at"] for c in calls)
+    return "%s to %s" % (times[0], times[-1]) if times else "-"
+
+
+def render(calls, request_count):
+    final = [c for c in calls if c["final"]]
+    superseded = [c for c in calls if not c["final"]]
+    final_lines, (n, inp, out, c) = table(final)
+    per_request = [
+        "| Measure | Value |",
+        "| --- | ---: |",
+        "| Requests in the final run | %d |" % request_count,
+        "| Model calls per request | %.3f |" % (n / request_count),
+        "| Average input tokens per request | {:,.1f} |".format(inp / request_count),
+        "| Average output tokens per request | {:,.1f} |".format(out / request_count),
+        "| Average total tokens per request | {:,.1f} |".format((inp + out) / request_count),
+        "| Estimated total cost (USD) | %s |" % usd(c),
+        "| Estimated cost per request (USD) | %s |" % usd(c / request_count),
+    ]
+    prices = ["| Model | Input (USD / 1M tokens) | Output (USD / 1M tokens) |", "| --- | ---: | ---: |"]
+    for model, (p_in, p_out) in sorted(PRICES.items()):
+        prices.append("| %s | $%.2f | $%.2f |" % (model, p_in, p_out))
+
+    lines = [
+        "# Token usage report",
+        "",
+        "Generated by `python3 code/usage_report.py` from `code/llm_cache/usage.jsonl`, the record the "
+        "LLM gateway appends to on every real model call (model, purpose, input and output tokens). "
+        "Do not edit by hand; rerun the command instead.",
+        "",
+        "## Final full-dataset run",
+        "",
+        "The final `output.csv` was written by `python3 code/main.py --strict` with "
+        "`DELETION_AUDIT_OFFLINE=1`: that run itself made **no model calls**. It reads every LLM result "
+        "from the committed cache in `code/llm_cache/`. The calls below are the ones whose cached "
+        "results it read, so they are the model cost of producing `output.csv`. A call counts here "
+        "when its result is still in the cache (`code/llm_cache/<purpose>/<cache_key>.json`).",
+        "",
+        "- Provider: %s (Claude API, Messages endpoint, standard rate; no batch, no prompt caching)." % PROVIDER,
+        "- `evidence_extraction`: one call per PDF or image evidence file, reading it into "
+        "snapshot-shaped records.",
+        "- `request_classification`: batched calls deciding whether each distinct `request_text` asks "
+        "for deletion. The batches covered every distinct request text in the full request set, the "
+        "32 samples and our evaluation cases, so the token counts slightly overstate the cost of the "
+        "518 requests alone.",
+        "- Final calls recorded: %s." % window(final),
+        "",
+    ] + final_lines + [
+        "",
+        "### Per request",
+        "",
+        "Averages divide the totals above by the number of requests in the final run "
+        "(`dataset/deletion_requests.csv`).",
+        "",
+    ] + per_request + [
+        "",
+        "## Superseded calls",
+        "",
+        "Real calls whose results were discarded and are not read by the final run (their cache "
+        "entries were removed before a rerun). They were paid for, so they are listed here and "
+        "included in the grand total, but not in the final-run figures above. " + SUPERSEDED_NOTE,
+        "",
+    ]
+    if superseded:
+        sup_lines, _ = table(superseded, "Superseded total")
+        all_lines, _ = table(calls, "All recorded calls")
+        lines += ["- Recorded: %s." % window(superseded), ""] + sup_lines + [
+            "", "All recorded calls (final plus superseded):", ""] + all_lines
+    else:
+        lines.append("None.")
+    lines += [
+        "",
+        "## Prices used (estimate)",
+        "",
+        "Costs are **estimates**: token counts from the API's `usage` field multiplied by Anthropic's "
+        "published first-party per-token list prices below (Claude API model table as of 2026-10-06; "
+        "Haiku 5.5's rate is for prompts up to 100K tokens, which every call here is). Taxes, "
+        "discounts and any account-specific pricing are not included.",
+        "",
+    ] + prices
+    return "\n".join(lines) + "\n"
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Write the token usage report from usage.jsonl")
+    parser.add_argument("--cache-dir", type=Path, default=DEFAULT_CACHE)
+    parser.add_argument("--requests", type=Path, default=DEFAULT_REQUESTS)
+    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    args = parser.parse_args(argv)
+    with open(args.requests, newline="", encoding="utf-8") as f:
+        request_count = sum(1 for _ in csv.DictReader(f))
+    text = render(load_calls(args.cache_dir), request_count)
+    args.output.write_text(text, encoding="utf-8")
+    print("wrote %s" % args.output)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

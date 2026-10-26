@@ -1,0 +1,114 @@
+{
+  "model": "claude-sonnet-5-5",
+  "purpose": "evidence_extraction",
+  "result": {
+    "document_kind": "support helpline console ticket view",
+    "records": [
+      {
+        "email": "kagyeman8947@fastmail.com",
+        "email_hash": null,
+        "file_name": null,
+        "name": "Kofi Agyeman",
+        "notes": "Ticket 'Where is my delivery?' assigned to agent Maya Chen, normal priority, tags Delivery, Tracking, Order update.",
+        "order_id": "ORD-20265034",
+        "phone": null,
+        "record_type": "support_ticket",
+        "related_references": [
+          "ORD-20265034",
+          "SWF-884103"
+        ],
+        "resource_id": "support_1034",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": null,
+        "system_id": "support_platform",
+        "ticket_id": "CS-5034",
+        "user_id": null
+      },
+      {
+        "email": null,
+        "email_hash": null,
+        "file_name": null,
+        "name": "Kofi Agyeman",
+        "notes": "Message 1 at 09:12 from the customer asking where the order is.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "support_message",
+        "related_references": [
+          "support_1034"
+        ],
+        "resource_id": "",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": null,
+        "system_id": "support_platform",
+        "ticket_id": "CS-5034",
+        "user_id": null
+      },
+      {
+        "email": null,
+        "email_hash": null,
+        "file_name": null,
+        "name": "Northstar Bot",
+        "notes": "Message 2 at 09:13, automated acknowledgement.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "support_message",
+        "related_references": [
+          "support_1034"
+        ],
+        "resource_id": "",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": null,
+        "system_id": "support_platform",
+        "ticket_id": "CS-5034",
+        "user_id": null
+      },
+      {
+        "email": null,
+        "email_hash": null,
+        "file_name": null,
+        "name": "Maya Chen",
+        "notes": "Message 3 at 09:28 from the agent saying delivery is on track for 26 May.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "support_message",
+        "related_references": [
+          "support_1034"
+        ],
+        "resource_id": "",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": null,
+        "system_id": "support_platform",
+        "ticket_id": "CS-5034",
+        "user_id": null
+      },
+      {
+        "email": null,
+        "email_hash": null,
+        "file_name": null,
+        "name": "Kofi Agyeman",
+        "notes": "Message 4 at 09:35 from the customer saying thanks.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "support_message",
+        "related_references": [
+          "support_1034"
+        ],
+        "resource_id": "",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": null,
+        "system_id": "support_platform",
+        "ticket_id": "CS-5034",
+        "user_id": null
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 5726,
+    "output_tokens": 1318
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer reports incomplete deletion of the account and search result and asks the shop to finish it.",
+  "request_text": "I was told that deletion was complete, but the account and its search result can still be found. Please investigate and finish the deletion."
+}

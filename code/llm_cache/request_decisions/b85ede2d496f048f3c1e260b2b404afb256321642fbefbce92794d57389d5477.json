@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer requests deletion of associated records and confirmation of review.",
+  "request_text": "I am requesting deletion of the account registered to this email address. Please include records associated with the account under your privacy process. Please confirm when the review is complete."
+}

@@ -1,0 +1,87 @@
+{
+  "model": "claude-sonnet-5-5",
+  "purpose": "evidence_extraction",
+  "result": {
+    "document_kind": "backup recovery manager console (customer-platform archives)",
+    "records": [
+      {
+        "email": "bluepeakco@outlook.com",
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Region ap-southeast-1, created 26 Apr 02:00, 102.3 GB, AES-256.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "backup_entry",
+        "related_references": [],
+        "resource_id": "backup_9291",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "Archive",
+        "system_id": "backup_service",
+        "ticket_id": null,
+        "user_id": null
+      },
+      {
+        "email": "miller.logistics@company.com",
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Region us-west-2, created 26 Apr 02:00, 67.1 GB, AES-256.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "backup_entry",
+        "related_references": [],
+        "resource_id": "backup_9288",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "Archive",
+        "system_id": "backup_service",
+        "ticket_id": null,
+        "user_id": null
+      },
+      {
+        "email": "areed1433@gmail.com",
+        "email_hash": null,
+        "file_name": "segment-42-20260426.tar.zst",
+        "name": null,
+        "notes": "Selected archive in eu-west-1, 84.7 GB, AES-256, checksum verified, last drill 29 Mar 2026.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "backup_entry",
+        "related_references": [
+          "s3://northstar-backups/customer-platform/weekly/segment-42-20260426.tar.zst"
+        ],
+        "resource_id": "backup_9287",
+        "retention_until": "2026-07-26",
+        "state": "PRESENT",
+        "status": "Archive",
+        "system_id": "backup_service",
+        "ticket_id": null,
+        "user_id": null
+      },
+      {
+        "email": "summit-retail@company.com",
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Region us-east-1, 91.4 GB, AES-256; activity shows restored 25 Apr, completed.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "backup_entry",
+        "related_references": [],
+        "resource_id": "backup_9286",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "Archive",
+        "system_id": "backup_service",
+        "ticket_id": null,
+        "user_id": null
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 5661,
+    "output_tokens": 774
+  }
+}

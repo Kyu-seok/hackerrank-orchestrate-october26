@@ -1,0 +1,6 @@
+{
+  "deletion_requested": false,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to change the email address on the account and wants to keep using the service.",
+  "request_text": "Please change the email address used for this account. I want to continue using the service."
+}

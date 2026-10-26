@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer requests permanent account deletion across all covered systems and a confirmation.",
+  "request_text": "Please treat this message as a request for permanent account deletion. Please apply the request across the systems covered by your deletion policy. Please send a confirmation after the process finishes."
+}

@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer is deleting their account and asks that analytics no longer point back to them.",
+  "request_text": "I’m deleting my account. You can keep anonymous statistics, but nothing in analytics should still point back to me."
+}

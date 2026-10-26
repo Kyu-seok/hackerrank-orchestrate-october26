@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to close the account, delete personal data, and handle copies in scope.",
+  "request_text": "Please close my account and process the associated personal-data deletion. Please handle any copies that fall within the scope of the deletion request. Let me know when the request has been completed."
+}

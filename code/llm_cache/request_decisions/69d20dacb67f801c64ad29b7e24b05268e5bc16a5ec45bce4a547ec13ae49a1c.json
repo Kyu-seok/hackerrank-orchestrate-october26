@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks the shop to verify that their account was deleted.",
+  "request_text": "Can you verify that my account was deleted? A search result with a similar email belongs to someone else, so please do not treat that record as mine."
+}

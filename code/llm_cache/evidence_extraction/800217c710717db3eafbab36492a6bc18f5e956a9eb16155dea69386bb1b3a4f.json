@@ -1,0 +1,34 @@
+{
+  "model": "claude-sonnet-5-5",
+  "purpose": "evidence_extraction",
+  "result": {
+    "document_kind": "customer statement (order and payment history)",
+    "records": [
+      {
+        "email": "ingrid.dahl@outlook.com",
+        "email_hash": null,
+        "file_name": "account_history_report_20260718.pdf",
+        "name": "Ingrid Dahl",
+        "notes": "Statement NST-2026-0718-1842 lists a smart desk lamp order (total EUR 71.93), Visa ending 4821, delivered 14 Jul, delivery address 24 Fjordgata, 7010 Trondheim, Norway.",
+        "order_id": "ORD-20261260",
+        "phone": null,
+        "record_type": "customer_statement",
+        "related_references": [
+          "NST-2026-0718-1842",
+          "ORD-20261260"
+        ],
+        "resource_id": "",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "paid",
+        "system_id": "account_service",
+        "ticket_id": null,
+        "user_id": "user_18"
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 6461,
+    "output_tokens": 289
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "model": "claude-haiku-5-5",
+  "purpose": "request_classification",
+  "result": {
+    "decisions": [
+      {
+        "deletion_requested": true,
+        "id": "r1",
+        "reason": "Customer asks to delete the account and its personal data and confirm completion."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r2",
+        "reason": "Customer asks to delete the account and its personal data and receive confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r3",
+        "reason": "Customer asks to delete the account and its personal data and confirm the outcome."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r4",
+        "reason": "Customer asks to delete the account and its personal data and confirm the review."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r5",
+        "reason": "Customer asks to delete the account and its personal data and be contacted for verification."
+      },
+      {
+        "deletion_requested": false,
+        "id": "r6",
+        "reason": "Customer asks for a portable copy of their data and to keep the account open."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r7",
+        "reason": "Customer says an earlier account deletion failed and asks for remaining data to be checked and deleted."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r8",
+        "reason": "Customer is deleting their account and asks that analytics no longer point back to them."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r9",
+        "reason": "Customer requests permanent deletion of the account, including past identifiers, and confirmation of the result."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r10",
+        "reason": "Customer asks to remove the remaining old profile and its search result."
+      },
+      {
+        "deletion_requested": false,
+        "id": "r11",
+        "reason": "Customer asks to correct a misspelled surname without removing records."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r12",
+        "reason": "Customer asks for an audit confirming the account was fully deleted."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r13",
+        "reason": "Customer asks to begin account deletion and be notified when completed."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r14",
+        "reason": "Customer asks to apply deletion across covered systems and confirm completion."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r15",
+        "reason": "Customer asks to start account deletion and confirm the result after checks."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r16",
+        "reason": "Customer asks to start account deletion and confirm when review is complete."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r17",
+        "reason": "Customer asks to start account deletion and be contacted for verification."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r18",
+        "reason": "Customer asks to start account deletion and be told when reviewed."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r19",
+        "reason": "Customer asks to start account deletion and be told when reviewed."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r20",
+        "reason": "Customer asks to start account deletion and have it applied to records."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r21",
+        "reason": "Customer asks to start account deletion and be told when reviewed."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r22",
+        "reason": "Customer asks to start account deletion under retention rules and get confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r23",
+        "reason": "Customer asks to start account deletion and be told when reviewed."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r24",
+        "reason": "Customer asks to start account deletion and handle copies in scope."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r25",
+        "reason": "Customer asks to start account deletion and handle copies in scope."
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 2682,
+    "output_tokens": 1137
+  }
+}

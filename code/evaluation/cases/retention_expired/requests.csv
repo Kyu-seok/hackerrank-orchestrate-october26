@@ -1,0 +1,2 @@
+case_id,email,requested_at,reported_status,reported_at,audit_at,request_text
+eval_retention_01,oliver-bennett@gmail.com,2026-09-03T04:00:00Z,COMPLETE,2026-09-04T22:00:00Z,2027-09-01T12:00:00Z,"I no longer use this account and would like it permanently deleted."

@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer requests account deletion including copies within scope and confirmation.",
+  "request_text": "I am requesting deletion of the account registered to this email address. Please handle any copies that fall within the scope of the deletion request. Please send a confirmation after the process finishes."
+}

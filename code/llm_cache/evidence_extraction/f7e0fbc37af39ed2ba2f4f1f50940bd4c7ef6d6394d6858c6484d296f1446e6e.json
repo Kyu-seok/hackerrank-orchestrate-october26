@@ -1,0 +1,85 @@
+{
+  "model": "claude-sonnet-5-5",
+  "purpose": "evidence_extraction",
+  "result": {
+    "document_kind": "integration connector management console (BridgeOps connections topology)",
+    "records": [
+      {
+        "email": "jain.aditi@gmail.com",
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Continuous sync to customer_analytics_warehouse, owner Data Platform, 1,284 events/hour, last contact 07:59:42.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "data_flow",
+        "related_references": [],
+        "resource_id": "data_flow_1121",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "Healthy",
+        "system_id": "integration_service",
+        "ticket_id": null,
+        "user_id": null
+      },
+      {
+        "email": "lucia-torres@gmail.com",
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Continuous mode to customer_analytics_warehouse, 842 events/hour, last contact 07:59:36.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "data_flow",
+        "related_references": [],
+        "resource_id": "data_flow_9846",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": null,
+        "system_id": "integration_service",
+        "ticket_id": null,
+        "user_id": null
+      },
+      {
+        "email": null,
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Order notifications connector to notification_service with selector 'order events', continuous, 650 events/hour.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "data_flow",
+        "related_references": [],
+        "resource_id": "",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": null,
+        "system_id": "integration_service",
+        "ticket_id": null,
+        "user_id": null
+      },
+      {
+        "email": null,
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Delivery tracking connector to logistics_warehouse with selector 'shipment events', continuous, 420 events/hour.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "data_flow",
+        "related_references": [],
+        "resource_id": "",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": null,
+        "system_id": "integration_service",
+        "ticket_id": null,
+        "user_id": null
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 5660,
+    "output_tokens": 697
+  }
+}

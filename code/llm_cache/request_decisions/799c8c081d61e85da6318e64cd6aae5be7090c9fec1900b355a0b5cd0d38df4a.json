@@ -1,0 +1,6 @@
+{
+  "deletion_requested": false,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks for a copy of invoices and to keep the profile in place.",
+  "request_text": "I need a copy of last year's invoices for my records. Please leave my profile and purchase history in place."
+}

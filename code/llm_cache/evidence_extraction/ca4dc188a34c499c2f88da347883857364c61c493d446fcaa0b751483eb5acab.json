@@ -1,0 +1,54 @@
+{
+  "model": "claude-sonnet-5-5",
+  "purpose": "evidence_extraction",
+  "result": {
+    "document_kind": "support ticket attachment (delivery address correction request PDF)",
+    "records": [
+      {
+        "email": "priya.raman@gmail.com",
+        "email_hash": null,
+        "file_name": null,
+        "name": "Priya Raman",
+        "notes": "Customer request to change apartment number from 14B to 18B and call before delivery; preferred contact SMS, carrier SwiftShip.",
+        "order_id": "ORD-20264827",
+        "phone": "+91 98765 73142",
+        "record_type": "support_ticket",
+        "related_references": [
+          "CS-4827",
+          "ORD-20264827"
+        ],
+        "resource_id": "support_001",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": null,
+        "system_id": "support_platform",
+        "ticket_id": "CS-4827",
+        "user_id": null
+      },
+      {
+        "email": null,
+        "email_hash": null,
+        "file_name": "delivery_address_correction.pdf",
+        "name": null,
+        "notes": "Attachment 312 KB in region ap-south, uploaded by customer, captured 12 Sep 2026 07:30 UTC, checksum prefix c90a42.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "support_attachment",
+        "related_references": [
+          "CS-4827"
+        ],
+        "resource_id": "",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": null,
+        "system_id": "support_platform",
+        "ticket_id": "CS-4827",
+        "user_id": null
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 6468,
+    "output_tokens": 440
+  }
+}

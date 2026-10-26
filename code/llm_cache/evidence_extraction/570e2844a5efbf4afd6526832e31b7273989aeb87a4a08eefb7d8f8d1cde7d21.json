@@ -1,0 +1,85 @@
+{
+  "model": "claude-sonnet-5-5",
+  "purpose": "evidence_extraction",
+  "result": {
+    "document_kind": "customer data export console (Customer Download Center)",
+    "records": [
+      {
+        "email": "marcus.lee@northstar.shop",
+        "email_hash": null,
+        "file_name": "customer_export_1261.zip",
+        "name": null,
+        "notes": "Created 20 Jun 14:18 UTC.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "customer_export",
+        "related_references": [],
+        "resource_id": "export_1261",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "Collecting",
+        "system_id": "export_service",
+        "ticket_id": null,
+        "user_id": null
+      },
+      {
+        "email": "ingrid.dahl@outlook.com",
+        "email_hash": null,
+        "file_name": "customer_export_1260.zip",
+        "name": null,
+        "notes": "Export contains Profile, Orders and Saved addresses; size 18.4 MB, download count 0.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "customer_export",
+        "related_references": [],
+        "resource_id": "export_1260",
+        "retention_until": "2026-06-25T06:42:00Z",
+        "state": "PRESENT",
+        "status": "Ready",
+        "system_id": "export_service",
+        "ticket_id": null,
+        "user_id": null
+      },
+      {
+        "email": "sara.kim@northstar.shop",
+        "email_hash": null,
+        "file_name": "customer_export_1259.zip",
+        "name": null,
+        "notes": "Created 17 Jun 11:03 UTC.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "customer_export",
+        "related_references": [],
+        "resource_id": "export_1259",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "Packaging",
+        "system_id": "export_service",
+        "ticket_id": null,
+        "user_id": null
+      },
+      {
+        "email": "daniel.park@northstar.shop",
+        "email_hash": null,
+        "file_name": "customer_export_1258.zip",
+        "name": null,
+        "notes": "Created 16 Jun 09:27 UTC.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "customer_export",
+        "related_references": [],
+        "resource_id": "export_1258",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "Ready",
+        "system_id": "export_service",
+        "ticket_id": null,
+        "user_id": null
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 5530,
+    "output_tokens": 700
+  }
+}

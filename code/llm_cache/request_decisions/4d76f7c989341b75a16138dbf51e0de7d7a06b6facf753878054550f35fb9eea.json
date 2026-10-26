@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks for the request to be applied to account records and a short confirmation on completion.",
+  "request_text": "I would like the account associated with this address to be erased. Please ensure the request is applied to the relevant account records. A short confirmation when the process is complete is sufficient."
+}

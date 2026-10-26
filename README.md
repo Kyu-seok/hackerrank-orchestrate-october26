@@ -23,21 +23,107 @@ cd hackerrank-orchestrate-october26
 
 Start your AI coding tool from the **repository root** so it automatically reads [`AGENTS.md`](./AGENTS.md) and logs your session turns to `log.txt` in the root directory.
 
-Build your solution in `code/main.py`, or use another language and document its setup and run command clearly in your README.
-
 Your solution must:
 
 - Read the input files from `dataset/`
 - Generate one prediction row for every request in `dataset/deletion_requests.csv`
 - Write the final predictions to `output.csv` in the repository root
 
-Run the starter Python entry point with:
+The blank template at `dataset/output.csv` is provided as a reference. Your final generated file for submission must be the root-level `output.csv`.
+
+---
+
+## Our Solution: Deletion-Audit Pipeline
+
+The pipeline has a deterministic core and uses an LLM only at the edges (see `docs/adr/0001-deterministic-core-llm-at-the-edges.md`):
+
+- Plain code does identity resolution, Resource discovery, state reconstruction, policy rules, the status decision and step ordering.
+- Claude Sonnet 5.5 reads the PDF and image evidence once.
+- Claude Haiku 5.5 decides once whether each `request_text` asks for deletion.
+
+Both LLM results are cached in `code/llm_cache/` and committed. A normal run makes no model calls and needs no API key.
+
+| Path | Contents |
+| --- | --- |
+| `code/main.py` | Entry point: audit a request file and write the answer CSV |
+| `code/deletion_audit/` | Pipeline package: evidence loaders (`evidence/`), category registry and rules, attribution, state, steps |
+| `code/deletion_audit/prompts/` | The two LLM prompts (`evidence_extraction.md`, `request_classification.md`) |
+| `code/extract_evidence.py`, `code/classify_requests.py` | One-time commands that fill the LLM cache |
+| `code/llm_cache/` | Cached LLM results and `usage.jsonl` (one line per real model call) |
+| `code/usage_report.py` | Writes `code/evaluation/usage_report.md` from `usage.jsonl` |
+| `code/evaluation/` | Scorer (`main.py`), tests (`test_*.py`), our evaluation cases (`cases/`), and the evaluation and usage reports |
+
+### Setup
+
+You need Python 3.9 or newer. The pipeline uses the standard library only, so there is nothing to install and no virtual environment. Run every command from the repository root.
+
+An API key is needed only to refill the LLM cache. Put `ANTHROPIC_API_KEY` in the environment or in an uncommitted `.env` file at the repo root. `.env` is git-ignored and is never logged or written.
+
+### Run
 
 ```bash
-python3 code/main.py
+DELETION_AUDIT_OFFLINE=1 python3 code/main.py --strict
 ```
 
-The blank template at `dataset/output.csv` is provided as a reference. Your final generated file for submission must be the root-level `output.csv`.
+This command produced the submitted `output.csv`: 518 rows sorted by `case_id`. It takes about a second.
+
+| Option | Effect |
+| --- | --- |
+| `--requests CSV` | Request file to audit (default: `dataset/deletion_requests.csv`) |
+| `--output CSV` | Answer file to write (default: `output.csv` at the repo root) |
+| `--strict` | Fail if any request has no cached deletion-request decision. Without it, that request is audited as a deletion request and named in one stderr warning. |
+
+The `dataset/` folder is always read from the repo root.
+
+### Offline mode and cache settings
+
+Normal runs only read the cache. A PDF or image with no cached extraction is skipped with one warning.
+
+| Variable | Effect |
+| --- | --- |
+| `DELETION_AUDIT_OFFLINE=1` | Cache only, even when an API key is present. A missing entry fails loudly. |
+| `DELETION_AUDIT_LLM_CACHE=DIR` | Use another cache folder |
+| `DELETION_AUDIT_DOTENV=PATH` | Read the key from another `.env` file. Set it to an empty value to read none; the tests do this so a key in the root `.env` never reaches them. |
+
+### One-time LLM commands (already run, results committed)
+
+These commands need `ANTHROPIC_API_KEY`. Each one sends only the inputs that have no cached result yet, so a rerun makes no model calls. Every real call is appended to `code/llm_cache/usage.jsonl` with its model, purpose and token counts.
+
+```bash
+python3 code/extract_evidence.py     # Claude Sonnet 5.5: each PDF/PNG under dataset/evidence/ into snapshot-shaped records
+python3 code/classify_requests.py    # Claude Haiku 5.5, batched: does each distinct request_text ask for deletion?
+python3 code/usage_report.py         # rewrite code/evaluation/usage_report.md from usage.jsonl (no model calls)
+```
+
+`classify_requests.py` covers the full request set, the samples and the evaluation cases. Requests it marks as not asking for deletion are answered `NOT_APPLICABLE` with `[]`.
+
+### Tests
+
+```bash
+python3 -m unittest discover -s code/evaluation -p "test_*.py"
+```
+
+The tests are end to end: they run the CLI and score its output on the samples and on every case in `code/evaluation/cases/`. They also cover the LLM gateway, extraction and classification against a fake API (no network), and the usage report. The full-run test rewrites the root `output.csv`.
+
+### Evaluation
+
+```bash
+DELETION_AUDIT_OFFLINE=1 python3 code/main.py --strict --requests dataset/sample_deletion_requests.csv --output /tmp/samples.csv
+python3 code/evaluation/main.py /tmp/samples.csv --verbose --markdown /tmp/samples.md
+DELETION_AUDIT_OFFLINE=1 python3 code/main.py --strict --requests code/evaluation/cases/retention_expired/requests.csv --output /tmp/case.csv
+python3 code/evaluation/main.py /tmp/case.csv --gold code/evaluation/cases/retention_expired/answers.csv --verbose
+```
+
+The scorer reports these measures:
+
+- status accuracy;
+- step precision, recall and F1;
+- positional field accuracy;
+- exact sequence accuracy;
+- output-contract and ordering errors;
+- with `--requests REQUESTS_CSV`, steps citing evidence captured after the case's `audit_at` (no labels needed, so it also runs on the full output: `python3 code/evaluation/main.py output.csv --gold output.csv --requests dataset/deletion_requests.csv`).
+
+Results, our evaluation cases, failures found and improvements made are in `code/evaluation/evaluation_report.md`. Token use and estimated cost are in `code/evaluation/usage_report.md`.
 
 
 ## Dataset

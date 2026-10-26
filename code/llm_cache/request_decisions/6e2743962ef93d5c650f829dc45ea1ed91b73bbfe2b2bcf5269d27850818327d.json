@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer requests deletion or de-identification of eligible account data and a short confirmation.",
+  "request_text": "I am requesting deletion of the account registered to this email address. Please review the account data that is eligible for deletion or de-identification. A short confirmation when the process is complete is sufficient."
+}

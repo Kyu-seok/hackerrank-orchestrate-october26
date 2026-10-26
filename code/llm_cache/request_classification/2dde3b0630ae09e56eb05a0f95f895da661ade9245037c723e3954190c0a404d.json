@@ -1,0 +1,137 @@
+{
+  "model": "claude-haiku-5-5",
+  "purpose": "request_classification",
+  "result": {
+    "decisions": [
+      {
+        "deletion_requested": true,
+        "id": "r1",
+        "reason": "Customer requests permanent account deletion including linked data under current or earlier identifiers."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r2",
+        "reason": "Customer requests permanent account deletion including associated records."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r3",
+        "reason": "Customer requests permanent account deletion under the personal-data deletion procedure."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r4",
+        "reason": "Customer requests permanent account deletion and review of data eligible for deletion."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r5",
+        "reason": "Customer requests permanent account deletion and confirmation of the result."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r6",
+        "reason": "Customer requests permanent account deletion and confirmation of the review."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r7",
+        "reason": "Customer requests permanent account deletion, with verification information if needed."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r8",
+        "reason": "Customer requests permanent account deletion and a confirmation afterward."
+      },
+      {
+        "deletion_requested": false,
+        "id": "r9",
+        "reason": "Customer asks only to be removed from marketing lists and keep the account and receipts."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r10",
+        "reason": "Customer asks to remove their profile and clean personal details from earlier support conversations."
+      },
+      {
+        "deletion_requested": false,
+        "id": "r11",
+        "reason": "Customer asks to stop promotional emails and explicitly does not want deletion."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r12",
+        "reason": "Customer requests permanent account deletion applied to covered records."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r13",
+        "reason": "Customer requests permanent account deletion and confirmation of the result."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r14",
+        "reason": "Customer requests permanent account deletion, with verification information if needed."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r15",
+        "reason": "Customer requests permanent account deletion across all covered systems and confirmation of outcome."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r16",
+        "reason": "Customer requests permanent account deletion across all covered systems."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r17",
+        "reason": "Customer requests permanent account deletion across all covered systems."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r18",
+        "reason": "Customer requests permanent account deletion across all covered systems and a confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r19",
+        "reason": "Customer requests permanent account deletion with checks on connected records and confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r20",
+        "reason": "Customer requests permanent account deletion with checks on connected records."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r21",
+        "reason": "Customer requests permanent account deletion with checks on connected records."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r22",
+        "reason": "Customer requests permanent account deletion with checks on connected records."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r23",
+        "reason": "Customer requests permanent account deletion with checks on connected records and confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r24",
+        "reason": "Customer requests permanent account deletion following identity and data review."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r25",
+        "reason": "Customer requests permanent account deletion applied to relevant account records."
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 2665,
+    "output_tokens": 1143
+  }
+}

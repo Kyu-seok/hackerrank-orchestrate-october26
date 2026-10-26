@@ -1,0 +1,6 @@
+{
+  "deletion_requested": false,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks for a portable copy of their data and to keep the account open.",
+  "request_text": "I'd like to download my account information in a portable format. Please keep the account as it is."
+}

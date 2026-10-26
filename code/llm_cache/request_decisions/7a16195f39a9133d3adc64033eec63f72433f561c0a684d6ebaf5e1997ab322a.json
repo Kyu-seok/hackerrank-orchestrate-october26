@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to delete the account, keeping only what the law requires.",
+  "request_text": "Please delete my account. Keep only what you are legally required to keep."
+}

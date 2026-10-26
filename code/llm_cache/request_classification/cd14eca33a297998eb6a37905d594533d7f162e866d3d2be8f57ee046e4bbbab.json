@@ -1,0 +1,137 @@
+{
+  "model": "claude-haiku-5-5",
+  "purpose": "request_classification",
+  "result": {
+    "decisions": [
+      {
+        "deletion_requested": true,
+        "id": "r1",
+        "reason": "Customer asks to erase the account linked to their email address."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r2",
+        "reason": "Customer asks to permanently delete the account associated with their email address."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r3",
+        "reason": "Customer asks to permanently delete the account associated with their email address."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r4",
+        "reason": "Customer asks to permanently delete the account across systems covered by the deletion policy."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r5",
+        "reason": "Customer asks to permanently delete the account across systems covered by the deletion policy."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r6",
+        "reason": "Customer asks to permanently delete the account and related records."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r7",
+        "reason": "Customer asks to permanently delete the account and related records."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r8",
+        "reason": "Customer asks to permanently delete the account and related records."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r9",
+        "reason": "Customer asks to permanently delete the account and associated data."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r10",
+        "reason": "Customer asks to permanently delete the account and associated data."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r11",
+        "reason": "Customer asks to permanently delete the account and relevant account records."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r12",
+        "reason": "Customer asks to permanently delete the account and relevant account records."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r13",
+        "reason": "Customer asks to permanently delete the account under retention and deletion requirements."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r14",
+        "reason": "Customer asks to permanently delete the account under retention and deletion requirements."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r15",
+        "reason": "Customer asks to permanently delete the account under retention and deletion requirements."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r16",
+        "reason": "Customer asks to permanently delete the account and copies within scope of the request."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r17",
+        "reason": "Customer asks to permanently delete the account and information linked via earlier identifiers."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r18",
+        "reason": "Customer asks to permanently delete the account and information linked via earlier identifiers."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r19",
+        "reason": "Customer asks to permanently delete the account and information linked via earlier identifiers."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r20",
+        "reason": "Customer asks to permanently delete the account and associated records under the privacy process."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r21",
+        "reason": "Customer asks to permanently delete the account and associated records under the privacy process."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r22",
+        "reason": "Customer asks to permanently delete the account and associated records under the privacy process."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r23",
+        "reason": "Customer asks to permanently delete the account and associated records under the privacy process."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r24",
+        "reason": "Customer asks to permanently delete the account under the standard personal-data deletion procedure."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r25",
+        "reason": "Customer asks to permanently delete the account under the standard personal-data deletion procedure."
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 2655,
+    "output_tokens": 1147
+  }
+}

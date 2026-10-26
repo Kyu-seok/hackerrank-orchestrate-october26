@@ -1,0 +1,137 @@
+{
+  "model": "claude-haiku-5-5",
+  "purpose": "request_classification",
+  "result": {
+    "decisions": [
+      {
+        "deletion_requested": true,
+        "id": "r1",
+        "reason": "Customer asks to verify that their deleted account profile is gone and retained security data is minimal."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r2",
+        "reason": "Customer asks to remove any remaining copy of their profile after an incomplete deletion."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r3",
+        "reason": "Customer asks to fully close the account and stop data being sent to other systems."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r4",
+        "reason": "Customer asks to confirm the profile is gone and remaining records cannot identify them."
+      },
+      {
+        "deletion_requested": false,
+        "id": "r5",
+        "reason": "Customer asks for a copy of invoices and to keep the profile in place."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r6",
+        "reason": "Customer asks to remove their name and contact details and close the account, allowing an internal reference."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r7",
+        "reason": "Customer asks for the account to be permanently deleted."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r8",
+        "reason": "Customer asks for the account to be permanently deleted with confirmation afterward."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r9",
+        "reason": "Customer asks for the account to be permanently deleted across covered systems."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r10",
+        "reason": "Customer asks for the account to be permanently deleted and the final outcome confirmed."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r11",
+        "reason": "Customer asks for the account to be permanently deleted and the result confirmed."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r12",
+        "reason": "Customer asks for the account to be permanently deleted and to be told when reviewed."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r13",
+        "reason": "Customer asks for the account to be permanently deleted after a data review."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r14",
+        "reason": "Customer asks for the account to be permanently deleted after a data review."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r15",
+        "reason": "Customer asks for the account to be permanently deleted across relevant records."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r16",
+        "reason": "Customer asks for the account to be permanently deleted and the outcome confirmed."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r17",
+        "reason": "Customer asks for the account to be permanently deleted across relevant records."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r18",
+        "reason": "Customer asks for the account to be permanently deleted with confirmation afterward."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r19",
+        "reason": "Customer asks for the account to be permanently deleted under retention rules."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r20",
+        "reason": "Customer asks for the account to be permanently deleted and the outcome confirmed."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r21",
+        "reason": "Customer asks for the account to be permanently deleted and the result confirmed."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r22",
+        "reason": "Customer asks for the account to be permanently deleted and to be told when reviewed."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r23",
+        "reason": "Customer asks for the account and information linked to identifiers to be permanently deleted."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r24",
+        "reason": "Customer asks for the account and associated records to be permanently deleted."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r25",
+        "reason": "Customer asks for the account and associated records to be permanently deleted."
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 2633,
+    "output_tokens": 1188
+  }
+}

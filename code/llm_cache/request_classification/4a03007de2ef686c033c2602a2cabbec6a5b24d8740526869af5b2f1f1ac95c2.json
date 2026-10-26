@@ -1,0 +1,137 @@
+{
+  "model": "claude-haiku-5-5",
+  "purpose": "request_classification",
+  "result": {
+    "decisions": [
+      {
+        "deletion_requested": true,
+        "id": "r1",
+        "reason": "Customer asks to begin account deletion, handle copies in scope, and confirm the result."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r2",
+        "reason": "Customer asks to begin account deletion including linked data under current or earlier identifiers and wants confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r3",
+        "reason": "Customer asks to begin account deletion including linked data under current or earlier identifiers and wants confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r4",
+        "reason": "Customer asks to begin account deletion including associated records and wants confirmation of the review."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r5",
+        "reason": "Customer asks to begin account deletion and review connected identifiers, with a confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r6",
+        "reason": "Customer asks to begin account deletion and review connected identifiers, with a confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r7",
+        "reason": "Customer asks to begin account deletion and review connected identifiers, with a confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r8",
+        "reason": "Customer asks to begin account deletion or de-identification of eligible data and wants confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r9",
+        "reason": "Customer asks to begin account deletion or de-identification of eligible data and wants to be notified."
+      },
+      {
+        "deletion_requested": false,
+        "id": "r10",
+        "reason": "Customer asks to change the email address on the account and wants to keep using the service."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r11",
+        "reason": "Customer asks to close the account and delete associated personal data, with confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r12",
+        "reason": "Customer asks to close the account and delete associated personal data, with confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r13",
+        "reason": "Customer asks to close the account and delete personal data across covered systems."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r14",
+        "reason": "Customer asks to close the account and delete personal data across covered systems, with notice of review."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r15",
+        "reason": "Customer asks to close the account, delete data, and confirm the final outcome."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r16",
+        "reason": "Customer asks to close the account and delete connected records."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r17",
+        "reason": "Customer asks to close the account, delete connected records, and receive confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r18",
+        "reason": "Customer asks to close the account and delete personal data after review, with notice of completion."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r19",
+        "reason": "Customer asks to close the account and delete personal data, with confirmation of review."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r20",
+        "reason": "Customer asks to close the account and delete personal data."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r21",
+        "reason": "Customer asks to close the account and apply deletion to account records, with confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r22",
+        "reason": "Customer asks to close the account and delete personal data per retention rules, with confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r23",
+        "reason": "Customer asks to close the account and delete personal data, with confirmation of the result."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r24",
+        "reason": "Customer asks to close the account and delete personal data, with notice after review."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r25",
+        "reason": "Customer asks to close the account, delete personal data, and handle copies in scope."
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 2682,
+    "output_tokens": 1225
+  }
+}

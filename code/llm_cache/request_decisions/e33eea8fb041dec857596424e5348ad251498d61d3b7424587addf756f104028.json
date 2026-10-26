@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to permanently close the account so backups cannot restore their personal profile.",
+  "request_text": "I want to close this account permanently. You may retain backups if required, but they must not be able to restore my personal profile."
+}

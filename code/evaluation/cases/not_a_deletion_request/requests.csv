@@ -1,0 +1,2 @@
+case_id,email,requested_at,reported_status,reported_at,audit_at,request_text
+eval_not_deletion_01,lucia-torres@gmail.com,2026-08-21T12:00:00Z,COMPLETE,2026-08-22T12:00:00Z,2026-09-15T12:00:00Z,"Could you send me a copy of the invoice for my last order and update the phone number on my profile? Please keep my account open; I am not asking you to delete anything."

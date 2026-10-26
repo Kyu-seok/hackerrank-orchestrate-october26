@@ -1,0 +1,116 @@
+{
+  "model": "claude-sonnet-5-5",
+  "purpose": "evidence_extraction",
+  "result": {
+    "document_kind": "customer reference registry (retained customer reference user_17)",
+    "records": [
+      {
+        "email": null,
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Customer key owned by Account Platform (eu-west), created 11 Jan 2024 08:42 UTC, last updated 10 Mar 2026 07:18 UTC, 4 linked records.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "customer_reference",
+        "related_references": [
+          "ORD-20263245",
+          "CS-3245",
+          "CS-3378",
+          "FIN-7742"
+        ],
+        "resource_id": "",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "Retained reference",
+        "system_id": "identity_service",
+        "ticket_id": null,
+        "user_id": "user_17"
+      },
+      {
+        "email": null,
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Orders record linked to customer, created 11 Jan 2024 08:45 UTC.",
+        "order_id": "ORD-20263245",
+        "phone": null,
+        "record_type": "retained_order",
+        "related_references": [
+          "user_17"
+        ],
+        "resource_id": "",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "Active",
+        "system_id": "legal_service",
+        "ticket_id": null,
+        "user_id": "user_17"
+      },
+      {
+        "email": null,
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Support record linked to customer, created 14 Feb 2024 12:16 UTC.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "support_ticket",
+        "related_references": [
+          "user_17"
+        ],
+        "resource_id": "",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "Active",
+        "system_id": "support_platform",
+        "ticket_id": "CS-3245",
+        "user_id": "user_17"
+      },
+      {
+        "email": null,
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Support record linked to customer, created 03 Jun 2024 09:27 UTC.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "support_ticket",
+        "related_references": [
+          "user_17"
+        ],
+        "resource_id": "",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "Active",
+        "system_id": "support_platform",
+        "ticket_id": "CS-3378",
+        "user_id": "user_17"
+      },
+      {
+        "email": null,
+        "email_hash": null,
+        "file_name": null,
+        "name": null,
+        "notes": "Finance record FIN-7742 linked to customer, created 22 Aug 2024 15:03 UTC.",
+        "order_id": null,
+        "phone": null,
+        "record_type": "finance_record",
+        "related_references": [
+          "user_17"
+        ],
+        "resource_id": "",
+        "retention_until": null,
+        "state": "PRESENT",
+        "status": "Active",
+        "system_id": "legal_service",
+        "ticket_id": null,
+        "user_id": "user_17"
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 5532,
+    "output_tokens": 882
+  }
+}

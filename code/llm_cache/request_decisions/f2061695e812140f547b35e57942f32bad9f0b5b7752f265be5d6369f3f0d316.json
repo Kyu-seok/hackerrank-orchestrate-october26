@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to erase the account and confirm when done.",
+  "request_text": "Please erase my account and confirm when it is done."
+}
