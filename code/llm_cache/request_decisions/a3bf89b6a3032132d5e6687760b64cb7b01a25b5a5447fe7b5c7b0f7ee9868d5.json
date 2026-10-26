@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks for the account to be erased through the normal review and to be told when completed.",
+  "request_text": "I would like the account associated with this address to be erased. Please complete the normal identity and data review for this request. Let me know when the request has been completed."
+}

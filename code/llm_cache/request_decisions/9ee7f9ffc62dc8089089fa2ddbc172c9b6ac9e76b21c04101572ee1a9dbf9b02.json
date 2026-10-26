@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to remove records linked to both old and current email addresses.",
+  "request_text": "I used this Yahoo address before changing the email on my account. Please remove records linked to both the old and current addresses."
+}

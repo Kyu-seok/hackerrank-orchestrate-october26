@@ -1,0 +1,6 @@
+{
+  "deletion_requested": false,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to stop promotional emails and explicitly does not want deletion.",
+  "request_text": "Please stop the promotional emails. I still need the account and my order history, so I am not asking for deletion."
+}

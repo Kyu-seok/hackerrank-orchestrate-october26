@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer reports leftover account traces in search, support and analytics and asks for removal and disabling of resync.",
+  "request_text": "I was told the account had been deleted, but I can still find traces in search, support, and analytics. Please handle them and disable any synchronization that could recreate them."
+}

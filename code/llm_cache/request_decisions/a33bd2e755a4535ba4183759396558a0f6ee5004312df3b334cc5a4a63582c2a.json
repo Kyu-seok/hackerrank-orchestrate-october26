@@ -1,0 +1,6 @@
+{
+  "deletion_requested": false,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks for a copy of their account data and says not to delete anything.",
+  "request_text": "Could you send me a copy of the information held on my account? I still use it, so please don't delete or change anything."
+}

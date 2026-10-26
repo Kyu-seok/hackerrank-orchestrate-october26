@@ -1,0 +1,137 @@
+{
+  "model": "claude-haiku-5-5",
+  "purpose": "request_classification",
+  "result": {
+    "decisions": [
+      {
+        "deletion_requested": true,
+        "id": "r1",
+        "reason": "Customer asks for permanent deletion of the account and its personal data."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r2",
+        "reason": "Customer asks for permanent deletion of the account and its personal data."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r3",
+        "reason": "Customer asks for permanent deletion of the account and connected identifiers, plus confirmation of outcome."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r4",
+        "reason": "Customer asks for permanent deletion of the account and connected identifiers, plus notice of completion."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r5",
+        "reason": "Customer asks for permanent deletion of the account and connected identifiers, plus confirmation of result."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r6",
+        "reason": "Customer asks for permanent deletion of the account and eligible data, plus notice of completion."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r7",
+        "reason": "Customer asks for a permanent account deletion and treatment of covered records, plus confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r8",
+        "reason": "Customer asks for a permanent account deletion and treatment of covered records, plus confirmation of outcome."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r9",
+        "reason": "Customer asks for a permanent account deletion and treatment of covered records, plus notice of completion."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r10",
+        "reason": "Customer asks for a permanent account deletion across systems covered by the deletion policy."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r11",
+        "reason": "Customer asks for a permanent account deletion and checks on connected records, plus confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r12",
+        "reason": "Customer asks for a permanent account deletion and checks on connected records, plus confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r13",
+        "reason": "Customer asks for a permanent account deletion and checks on connected records."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r14",
+        "reason": "Customer asks for a permanent account deletion and checks on connected records, plus review notice."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r15",
+        "reason": "Customer asks for a permanent account deletion and checks on connected records, plus confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r16",
+        "reason": "Customer asks for a permanent account deletion through identity and data review, plus notice of completion."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r17",
+        "reason": "Customer asks for a permanent account deletion through identity and data review, plus review notice."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r18",
+        "reason": "Customer asks for a permanent account deletion applied to account records, plus confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r19",
+        "reason": "Customer asks for a permanent account deletion applied to account records, plus confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r20",
+        "reason": "Customer asks for a permanent account deletion under retention rules, plus confirmation of outcome."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r21",
+        "reason": "Customer asks for a permanent account deletion under retention rules, plus confirmation of review."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r22",
+        "reason": "Customer asks for a permanent account deletion under retention rules, plus review notice."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r23",
+        "reason": "Customer asks for a permanent account deletion under retention rules, plus confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r24",
+        "reason": "Customer asks for a permanent account deletion including copies in scope, plus confirmation."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r25",
+        "reason": "Customer asks for a permanent account deletion including copies in scope, plus confirmation of outcome."
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 2710,
+    "output_tokens": 1296
+  }
+}

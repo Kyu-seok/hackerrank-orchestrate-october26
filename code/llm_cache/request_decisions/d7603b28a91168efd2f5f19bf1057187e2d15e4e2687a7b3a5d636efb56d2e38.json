@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to close the account and delete associated personal data, with confirmation.",
+  "request_text": "I want to close this account and have its associated personal data deleted. Please apply the correct treatment to records covered by the request. I would appreciate confirmation of the final outcome."
+}

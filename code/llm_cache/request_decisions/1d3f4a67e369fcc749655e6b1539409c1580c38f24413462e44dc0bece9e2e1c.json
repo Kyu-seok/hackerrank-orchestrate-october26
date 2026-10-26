@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to remove records under both email addresses and stop integrations copying them back.",
+  "request_text": "I used a different email on this account before changing it. Please remove records under both addresses and switch off any integration that could copy them back into search or analytics."
+}

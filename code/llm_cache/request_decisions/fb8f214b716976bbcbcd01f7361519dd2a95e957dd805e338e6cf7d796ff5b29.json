@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks for the account tied to this address to be erased, including copies, and confirmation.",
+  "request_text": "I would like the account associated with this address to be erased. Please handle any copies that fall within the scope of the deletion request. Please confirm when the review is complete."
+}

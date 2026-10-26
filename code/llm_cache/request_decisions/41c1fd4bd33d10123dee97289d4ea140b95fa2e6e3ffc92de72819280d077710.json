@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to remove any remaining copy of their profile after an incomplete deletion.",
+  "request_text": "I deleted this account and received a confirmation, but the same email address is still recognized. Please remove any remaining copy of my profile."
+}

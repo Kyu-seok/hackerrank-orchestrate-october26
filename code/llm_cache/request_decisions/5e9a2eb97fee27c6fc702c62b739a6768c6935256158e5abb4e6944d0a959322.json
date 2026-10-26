@@ -1,0 +1,6 @@
+{
+  "deletion_requested": false,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer needs help resetting login and explicitly asks not to close the account.",
+  "request_text": "I can't access my profile and need help resetting the login. Do not close the account."
+}

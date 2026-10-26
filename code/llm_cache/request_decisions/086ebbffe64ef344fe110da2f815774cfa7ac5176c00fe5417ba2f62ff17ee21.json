@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to delete the account, search results pointing to them, and the downloadable archive.",
+  "request_text": "Please delete this account, including the downloadable archive I requested earlier and any search result that still points to me. Security records can stay if policy requires them."
+}

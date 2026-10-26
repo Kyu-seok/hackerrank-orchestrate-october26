@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to begin account deletion including linked data under current or earlier identifiers and wants confirmation.",
+  "request_text": "Please begin the deletion process for the account using this email address. Please include information linked through current or earlier account identifiers. A short confirmation when the process is complete is sufficient."
+}

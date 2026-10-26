@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to delete the account and the identity document sent to support.",
+  "request_text": "Please delete my account and the identity document I sent to support while resolving a delivery issue."
+}

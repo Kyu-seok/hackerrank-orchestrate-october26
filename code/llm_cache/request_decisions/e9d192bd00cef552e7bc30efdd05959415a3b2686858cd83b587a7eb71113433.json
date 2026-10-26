@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to delete the account and remove data stored under an old email address.",
+  "request_text": "Please delete my account. I changed my email address earlier this year, so make sure anything stored under my old address is removed too."
+}

@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to permanently delete their account and personal data and confirm when review is complete.",
+  "request_text": "I no longer use this account and would like it permanently deleted. Please process this under the standard personal-data deletion procedure. Please confirm when the review is complete."
+}

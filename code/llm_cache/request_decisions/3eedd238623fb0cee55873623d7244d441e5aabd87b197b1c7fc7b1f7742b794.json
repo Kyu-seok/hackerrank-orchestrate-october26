@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer requests deletion of the account and contact if verification information is needed.",
+  "request_text": "I am requesting deletion of the account registered to this email address. Please ensure the request is applied to the relevant account records. Please contact me if you need information to verify the request."
+}

@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer requests deletion across covered systems and confirmation after completion.",
+  "request_text": "I am requesting deletion of the account registered to this email address. Please apply the request across the systems covered by your deletion policy. Please send a confirmation after the process finishes."
+}

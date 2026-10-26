@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks for permanent deletion of the account and eligible data, plus notice of completion.",
+  "request_text": "Please permanently delete the account associated with this email address. Please review the account data that is eligible for deletion or de-identification. Let me know when the request has been completed."
+}

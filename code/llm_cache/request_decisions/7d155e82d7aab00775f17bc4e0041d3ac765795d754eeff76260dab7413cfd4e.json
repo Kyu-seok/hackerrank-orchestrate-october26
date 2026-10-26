@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to delete the account and personal data, including connected identifiers, and confirm the result.",
+  "request_text": "I would like to submit a request to delete this account and its personal data. Please review any identifiers connected to this account as part of the request. Please confirm the result after completing the required checks."
+}

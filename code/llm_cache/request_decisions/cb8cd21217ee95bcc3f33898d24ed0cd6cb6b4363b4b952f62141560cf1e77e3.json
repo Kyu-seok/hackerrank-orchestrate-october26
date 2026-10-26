@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks for an audit confirming the account was fully deleted.",
+  "request_text": "Please audit the deletion as it stood when my request was reviewed. I want confirmation that the account was fully removed at that point."
+}

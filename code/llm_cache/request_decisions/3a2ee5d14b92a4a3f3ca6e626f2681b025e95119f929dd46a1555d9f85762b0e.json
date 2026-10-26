@@ -1,0 +1,6 @@
+{
+  "deletion_requested": false,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks what personal information is held, explicitly not erasure.",
+  "request_text": "Can you tell me what personal information you hold about me? This is an information request, not a request to erase it."
+}

@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer requests permanent account deletion of eligible data and a confirmation afterward.",
+  "request_text": "Please treat this message as a request for permanent account deletion. Please review the account data that is eligible for deletion or de-identification. Please send a confirmation after the process finishes."
+}

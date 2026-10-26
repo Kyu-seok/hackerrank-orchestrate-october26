@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to verify that their deleted account profile is gone and retained security data is minimal.",
+  "request_text": "I deleted my account and received the confirmation email. Could you verify that the profile is gone and that anything retained for security is limited to what is required?"
+}

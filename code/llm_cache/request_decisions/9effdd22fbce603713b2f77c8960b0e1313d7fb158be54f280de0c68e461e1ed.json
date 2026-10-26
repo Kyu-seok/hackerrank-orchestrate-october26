@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to delete a leftover data export file after closing the account.",
+  "request_text": "I closed my account, but an old “download your data” link still works. Please delete that export file as well."
+}

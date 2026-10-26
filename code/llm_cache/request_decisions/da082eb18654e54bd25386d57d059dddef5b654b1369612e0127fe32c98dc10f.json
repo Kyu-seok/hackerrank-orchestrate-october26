@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks for the account and information linked to identifiers to be permanently deleted.",
+  "request_text": "I no longer use this account and would like it permanently deleted. Please include information linked through current or earlier account identifiers. Please contact me if you need information to verify the request."
+}

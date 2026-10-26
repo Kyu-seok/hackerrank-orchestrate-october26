@@ -1,0 +1,32 @@
+{
+  "model": "claude-haiku-5-5",
+  "purpose": "request_classification",
+  "result": {
+    "decisions": [
+      {
+        "deletion_requested": false,
+        "id": "r1",
+        "reason": "Customer asks to update their mobile number and keep the account active."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r2",
+        "reason": "Customer asks the shop to verify whether their account and identifiable analytics data were removed after a failed deletion request."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r3",
+        "reason": "Customer requests complete deletion of the account linked to the email address and confirmation of the result."
+      },
+      {
+        "deletion_requested": true,
+        "id": "r4",
+        "reason": "Customer requests permanent deletion of the account linked to the email address and review of results."
+      }
+    ]
+  },
+  "usage": {
+    "input_tokens": 1231,
+    "output_tokens": 211
+  }
+}

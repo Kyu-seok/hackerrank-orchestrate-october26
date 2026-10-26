@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to remove the remaining old profile and its search result.",
+  "request_text": "My account page is gone, but my old profile still appears when I search for it. Can you remove that search result too?"
+}

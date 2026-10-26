@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks for the account to be erased across all systems under the deletion policy and notification on completion.",
+  "request_text": "I would like the account associated with this address to be erased. Please apply the request across the systems covered by your deletion policy. Let me know when the request has been completed."
+}

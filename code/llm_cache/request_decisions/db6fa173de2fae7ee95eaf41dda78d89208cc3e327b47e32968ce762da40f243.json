@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer requests permanent account deletion including copies within its scope.",
+  "request_text": "Please treat this message as a request for permanent account deletion. Please handle any copies that fall within the scope of the deletion request. A short confirmation when the process is complete is sufficient."
+}

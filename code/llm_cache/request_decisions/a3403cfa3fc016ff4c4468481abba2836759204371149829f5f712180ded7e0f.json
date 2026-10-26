@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to delete the account and every copy of the profile and confirm nothing remains.",
+  "request_text": "Please delete my account and every copy of my profile. I want confirmation that nothing remains."
+}

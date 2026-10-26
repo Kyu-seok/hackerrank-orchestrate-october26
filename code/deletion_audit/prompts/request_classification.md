@@ -12,6 +12,8 @@ its own language. Do not translate it first.
 Set `deletion_requested` to true when the customer asks for deletion, including when they:
 
 - complain that an earlier deletion was not finished and ask for the rest to be removed
+- ask the shop to verify, audit or confirm that their account or data was deleted (a check on
+  their own deletion request is part of handling that request)
 - ask for deletion and also mention other systems, integrations, backups or old email addresses
 
 Set it to false when the message asks only for something else, such as:

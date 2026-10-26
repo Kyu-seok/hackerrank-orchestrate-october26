@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to erase the account linked to the email address and apply it to account records.",
+  "request_text": "Please erase the account linked to this email address. Please ensure the request is applied to the relevant account records. Please confirm when the review is complete."
+}

@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to remove their account and personal information and confirm completion.",
+  "request_text": "I am asking you to remove my account and the personal information linked to it. Please check the records connected to the account before confirming completion. Please confirm when the review is complete."
+}

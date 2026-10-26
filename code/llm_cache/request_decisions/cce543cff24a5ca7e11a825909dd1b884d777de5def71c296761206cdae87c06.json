@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to delete the account and remove them from the directory after earlier deletion was incomplete.",
+  "request_text": "Please delete my account and remove me from your customer directory. My details keep showing up again after you said they were gone."
+}

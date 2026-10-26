@@ -1,0 +1,6 @@
+{
+  "deletion_requested": true,
+  "model": "claude-haiku-5-5",
+  "reason": "Customer asks to verify that all data tied to the old email was removed after account deletion.",
+  "request_text": "I changed the email on this account before deleting it. Please check that nothing tied to the old address was left behind, even in systems that do not display the email."
+}
