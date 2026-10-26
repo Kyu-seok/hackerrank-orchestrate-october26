@@ -1,0 +1,2 @@
+case_id,email,requested_at,reported_status,reported_at,audit_at,request_text
+eval_sync_01,jain.aditi@gmail.com,2026-08-24T09:00:00Z,COMPLETE,2026-08-25T12:00:00Z,2026-09-15T12:00:00Z,"Please delete my account and remove me from your customer directory. My details keep showing up again after you said they were gone."

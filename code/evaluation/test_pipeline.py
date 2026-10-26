@@ -116,6 +116,59 @@ class SampleRun(unittest.TestCase):
                 mismatched.append(case_id)
         self.assertEqual(sorted(set(mismatched) - known_gaps), [])
 
+    def system_steps(self, case_id, system_id):
+        return [(s["phase"], s["operation"], s["state"], s["resource_id"], s["evidence_id"])
+                for s in steps_for(self.rows, case_id)[1] if s["system_id"] == system_id]
+
+    def test_active_data_flow_is_reported_disabled_and_verified(self):
+        # evidence_01 heartbeat: data_flow_9846 for lucia-torres@ still enabled and scheduled.
+        self.assertEqual(steps_for(self.rows, "case_15")[0], "INCOMPLETE")
+        self.assertEqual(self.system_steps("case_15", "integration_service"), [
+            ("FINDING", "REPORT_ACTIVE_DATA_FLOW", "ACTIVE", "data_flow_9846", "evidence_01"),
+            ("REMEDIATION", "DISABLE_DATA_FLOW", "DISABLED", "data_flow_9846", ""),
+            ("VERIFICATION", "VERIFY_DATA_FLOW_DISABLED", "DISABLED", "data_flow_9846", "")])
+
+    def test_restorable_backup_is_reported_blocked_and_verified_never_deleted(self):
+        # evidence_93 inventory: backup_4978 for k.appiah88@ has restore_allowed=1. evidence_06
+        # repeats it at 08:57 but was exported after audit_at, so it is never cited.
+        self.assertEqual(steps_for(self.rows, "case_09")[0], "INCOMPLETE")
+        self.assertEqual(self.system_steps("case_09", "backup_service"), [
+            ("FINDING", "REPORT_RESTORE_RISK", "ACTIVE", "backup_4978", "evidence_93"),
+            ("REMEDIATION", "BLOCK_RESTORE", "BLOCKED", "backup_4978", ""),
+            ("VERIFICATION", "VERIFY_RESTORE_BLOCKED", "BLOCKED", "backup_4978", "")])
+        for row in self.rows:
+            for s in json.loads(row["steps_json"]):
+                if s["system_id"] == "backup_service":
+                    self.assertNotIn(s["operation"], ("DELETE_RECORD", "VERIFY_RECORD_ABSENT"), row["case_id"])
+
+    def test_already_stopped_flow_and_blocked_backup_cite_the_check_that_proves_it(self):
+        # evidence_92 service export: data_flow_6244 enabled=false, backup_3120 restore_allowed=false.
+        status, steps = steps_for(self.rows, "case_26")
+        got = [(s["phase"], s["operation"], s["state"], s["resource_id"], s["evidence_id"])
+               for s in steps if s["system_id"] in ("integration_service", "backup_service")]
+        self.assertEqual(got, [
+            ("VERIFICATION", "VERIFY_DATA_FLOW_DISABLED", "DISABLED", "data_flow_6244", "evidence_92"),
+            ("VERIFICATION", "VERIFY_RESTORE_BLOCKED", "BLOCKED", "backup_3120", "evidence_92")])
+
+    def test_flow_and_backup_steps_match_labeled_samples(self):
+        """Every sample's integration_service and backup_service steps match the answers exactly.
+
+        Known gap, owned by the identity-history ticket: case_29/30 request with a
+        historical email, and their connectors select that old email.
+        """
+        known_gaps = {"case_29", "case_30"}
+        gold = read_rows(DATASET / "sample_output.csv")
+        systems = ("integration_service", "backup_service")
+        mismatched = []
+        for row in gold:
+            want = [{k: v for k, v in s.items() if k != "step_no"}
+                    for s in json.loads(row["steps_json"]) if s["system_id"] in systems]
+            got = [{k: v for k, v in s.items() if k != "step_no"}
+                   for s in steps_for(self.rows, row["case_id"])[1] if s["system_id"] in systems]
+            if want != got:
+                mismatched.append(row["case_id"])
+        self.assertEqual(sorted(set(mismatched) - known_gaps), [])
+
 
 class EvaluationCases(unittest.TestCase):
     """Our own cases: each folder under cases/ holds requests.csv and answers.csv."""
