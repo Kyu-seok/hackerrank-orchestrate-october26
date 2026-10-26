@@ -55,8 +55,10 @@ class CannedExtraction:
 
 
 def offline_env(cache_dir):
+    """No API key: none in the environment, and the repo root's .env (if any) is not read."""
     env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
     env["DELETION_AUDIT_LLM_CACHE"] = str(cache_dir)
+    env["DELETION_AUDIT_DOTENV"] = str(Path(cache_dir).parent / "absent.env")
     env["DELETION_AUDIT_OFFLINE"] = "1"
     return env
 

@@ -58,7 +58,9 @@ python3 code/extract_evidence.py
 Normal runs never call the model for evidence: they read the cache, and skip (with one warning)
 any PDF/image that has no cached extraction. Every real model call is appended to
 `code/llm_cache/usage.jsonl` (model, purpose, input/output tokens). `DELETION_AUDIT_OFFLINE=1`
-forces cache-only mode even with a key; `DELETION_AUDIT_LLM_CACHE` points at another cache folder.
+forces cache-only mode even with a key; `DELETION_AUDIT_LLM_CACHE` points at another cache folder;
+`DELETION_AUDIT_DOTENV` points at another `.env` file (empty: read none; the tests use this so a
+key in the root `.env` never reaches them).
 
 Whether `request_text` asks for deletion is decided once by Claude Haiku 5.5, in batches, and
 cached per distinct request text in `code/llm_cache/request_decisions/` (prompt:

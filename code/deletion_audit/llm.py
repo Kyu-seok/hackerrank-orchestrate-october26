@@ -19,12 +19,15 @@ API_KEY_VAR = "ANTHROPIC_API_KEY"
 USAGE_FILE = "usage.jsonl"
 OFFLINE_VAR = "DELETION_AUDIT_OFFLINE"
 CACHE_DIR_VAR = "DELETION_AUDIT_LLM_CACHE"
+# Path of the .env read for the API key (default: the repo root's). Empty: read no .env.
+DOTENV_VAR = "DELETION_AUDIT_DOTENV"
 BASE_URL_VAR = "ANTHROPIC_BASE_URL"
 DEFAULT_BASE_URL = "https://api.anthropic.com"
 API_VERSION = "2026-10-21"
 RETRYABLE_STATUS = {408, 409, 429, 500, 502, 503, 504, 529}
 DEFAULT_CACHE_DIR = REPO_ROOT / "code" / "llm_cache"
 DEFAULT_DOTENV = REPO_ROOT / ".env"
+_DEFAULT = object()  # Gateway(dotenv_path=...) not given
 
 
 class GatewayError(RuntimeError):
@@ -96,14 +99,18 @@ class Gateway:
     """Cache-first access to the Messages API.
 
     ``env`` defaults to ``os.environ``; ``dotenv_path`` is an optional uncommitted
-    ``.env`` read only for ``ANTHROPIC_API_KEY``. The key is held in memory and
-    passed to the transport; it is never logged, cached or put in an error message.
+    ``.env`` read only for ``ANTHROPIC_API_KEY`` (``None``: none; default:
+    ``DELETION_AUDIT_DOTENV`` if set, an empty value meaning none, else the repo
+    root's ``.env``). The key is held in memory and passed to the transport; it is
+    never logged, cached or put in an error message.
     """
 
-    def __init__(self, cache_dir=None, env=None, dotenv_path=DEFAULT_DOTENV, transport=None, offline=False):
+    def __init__(self, cache_dir=None, env=None, dotenv_path=_DEFAULT, transport=None, offline=False):
         self._env = os.environ if env is None else env
         self.cache_dir = Path(cache_dir or self._env.get(CACHE_DIR_VAR) or DEFAULT_CACHE_DIR)
         self._offline = offline
+        if dotenv_path is _DEFAULT:
+            dotenv_path = self._env.get(DOTENV_VAR, DEFAULT_DOTENV)
         self._dotenv_path = Path(dotenv_path) if dotenv_path else None
         self._transport = transport or UrllibTransport(base_url=self._env.get(BASE_URL_VAR))
 
