@@ -1,6 +1,7 @@
 """Audit a request file and write the answer CSV."""
 
 import csv
+import sys
 
 from . import classification, state, steps
 from .activities import WorkerActions
@@ -28,10 +29,16 @@ class Auditor:
         known.update({r.case_id: r for r in requests})
         self.attributor = Attributor(self.dataset, self.store, list(known.values()))
         self.worker_actions = WorkerActions(self.dataset)
+        self.classifier = classification.Classifier()
+        self.unclassified = []
 
     def audit(self, request):
         """Return (deletion_status, steps) for one request."""
-        if not classification.is_deletion_request(request):
+        deletion_requested = self.classifier.decide(request)
+        if deletion_requested is None:
+            # No cached decision: audit it as a deletion request, and say so (see run()).
+            self.unclassified.append(request.case_id)
+        elif not deletion_requested:
             return steps.NOT_APPLICABLE, []
         assessments = []
         for category, resource_id in self.attributor.resources(request):
@@ -48,9 +55,28 @@ class Auditor:
         return steps.build(assessments)
 
 
-def run(requests_path, output_path):
+class ClassificationMissing(RuntimeError):
+    """``strict`` run and some request texts have no cached deletion-request decision."""
+
+
+FILL_COMMAND = "python3 code/classify_requests.py"
+
+
+def run(requests_path, output_path, strict=False):
+    """Audit every request and write the answer CSV.
+
+    A request whose text has no cached deletion-request decision is audited as a
+    deletion request and named in one stderr warning. With ``strict`` the run
+    instead raises ``ClassificationMissing`` before writing anything.
+    """
     requests = sorted(load_requests(requests_path), key=lambda r: r.case_id)
     auditor = Auditor(requests)
+    if strict:
+        missing = [r.case_id for r in requests if auditor.classifier.decide(r) is None]
+        if missing:
+            raise ClassificationMissing(
+                "%d request(s) have no cached deletion-request classification (%s). Fill the cache "
+                "once with: %s (ANTHROPIC_API_KEY set)" % (len(missing), _summary(missing), FILL_COMMAND))
     rows = []
     for request in requests:
         status, case_steps = auditor.audit(request)
@@ -59,4 +85,14 @@ def run(requests_path, output_path):
         writer = csv.writer(f)
         writer.writerow(["case_id", "deletion_status", "steps_json"])
         writer.writerows(rows)
+    if auditor.unclassified:
+        print("warning: %d request(s) have no cached deletion-request classification and were audited "
+              "as deletion requests (%s). Fill the cache once with: %s (ANTHROPIC_API_KEY set); "
+              "pass --strict to fail instead." % (len(auditor.unclassified), _summary(auditor.unclassified),
+                                                  FILL_COMMAND), file=sys.stderr)
     return rows
+
+
+def _summary(case_ids, limit=10):
+    shown = ", ".join(case_ids[:limit])
+    return shown + (", ... (+%d more)" % (len(case_ids) - limit) if len(case_ids) > limit else "")

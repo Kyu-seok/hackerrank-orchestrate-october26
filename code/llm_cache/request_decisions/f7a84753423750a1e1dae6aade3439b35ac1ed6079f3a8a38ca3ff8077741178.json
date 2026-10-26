@@ -1,0 +1,7 @@
+{
+  "deletion_requested": false,
+  "model": "fixture",
+  "reason": "Asks for an invoice copy and a phone-number update and explicitly asks to keep the account open; no deletion is requested.",
+  "request_text": "Could you send me a copy of the invoice for my last order and update the phone number on my profile? Please keep my account open; I am not asking you to delete anything.",
+  "source": "Fixed hand-written entry for code/evaluation/cases/not_a_deletion_request; not a model call."
+}

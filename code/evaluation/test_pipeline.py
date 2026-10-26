@@ -326,6 +326,11 @@ class EvaluationCases(unittest.TestCase):
         # The account carries no identifier in the case window; only a link-identity activity ties it.
         self.assert_case_scores_perfectly(CASES / "resource_linked_by_catalog")
 
+    def test_request_that_does_not_ask_for_deletion_is_not_applicable(self):
+        # The Subject has an active data flow (sample case_15), but asks for an invoice and a
+        # phone change; the committed classification cache entry says no deletion was requested.
+        self.assert_case_scores_perfectly(CASES / "not_a_deletion_request")
+
 
 class FullRun(unittest.TestCase):
     """With no options the pipeline answers the full request set into the root output.csv."""

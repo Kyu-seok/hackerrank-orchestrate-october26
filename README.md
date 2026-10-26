@@ -60,6 +60,19 @@ any PDF/image that has no cached extraction. Every real model call is appended t
 `code/llm_cache/usage.jsonl` (model, purpose, input/output tokens). `DELETION_AUDIT_OFFLINE=1`
 forces cache-only mode even with a key; `DELETION_AUDIT_LLM_CACHE` points at another cache folder.
 
+Whether `request_text` asks for deletion is decided once by Claude Haiku 5.5, in batches, and
+cached per distinct request text in `code/llm_cache/request_decisions/` (prompt:
+`code/deletion_audit/prompts/request_classification.md`). With `ANTHROPIC_API_KEY` set, run:
+
+```bash
+python3 code/classify_requests.py
+```
+
+It classifies the full request set, the samples and our evaluation cases; a rerun makes no
+model calls. Normal runs read the decisions and answer `NOT_APPLICABLE` with `[]` for
+non-deletion requests. A request with no cached decision is audited as a deletion request and
+listed in one warning on stderr; `python3 code/main.py --strict` fails instead.
+
 The blank template at `dataset/output.csv` is provided as a reference. Your final generated file for submission must be the root-level `output.csv`.
 
 
