@@ -104,17 +104,48 @@ class SampleRun(unittest.TestCase):
         whose accounts carry no identifiers, so the pick is a guess.
         """
         known_gaps = {"case_04", "case_10", "case_23", "case_29", "case_30", "case_31", "case_32"}
-        gold = read_rows(DATASET / "sample_output.csv")
+        self.assertEqual(sorted(set(self.mismatched_cases("account_service", ("phase", "operation", "resource_id")))
+                                - known_gaps), [])
+
+    def mismatched_cases(self, system_id, fields=("phase", "operation", "resource_id", "state", "evidence_id")):
+        """Cases whose steps for ``system_id`` differ from the labeled answers.
+
+        Steps are compared on ``fields`` only (not ``step_no``), so this measures
+        the system's own step recall and precision; position in the whole
+        sequence depends on the other systems too.
+        """
         mismatched = []
-        for row in gold:
+        for row in read_rows(DATASET / "sample_output.csv"):
             case_id = row["case_id"]
-            want = [(s["phase"], s["operation"], s["resource_id"])
-                    for s in json.loads(row["steps_json"]) if s["system_id"] == "account_service"]
-            got = [(s["phase"], s["operation"], s["resource_id"])
-                   for s in steps_for(self.rows, case_id)[1] if s["system_id"] == "account_service"]
-            if want != got:
+
+            def key(steps):
+                return sorted(tuple(s[f] for f in fields) for s in steps if s["system_id"] == system_id)
+            if key(json.loads(row["steps_json"])) != key(steps_for(self.rows, case_id)[1]):
                 mismatched.append(case_id)
-        self.assertEqual(sorted(set(mismatched) - known_gaps), [])
+        return mismatched
+
+    def test_search_index_entry_steps_match_labeled_samples(self):
+        """Every remaining search entry is reported, deleted and verified absent (rule_03).
+
+        Known gap, owned by identity history (#3): case_29/30 entries carry only
+        the Subject's old email.
+        """
+        known_gaps = {"case_29", "case_30"}
+        self.assertEqual(sorted(set(self.mismatched_cases("search_service")) - known_gaps), [])
+
+    def test_user_export_steps_match_labeled_samples(self):
+        # export_001 (case_08) and export_7364 (case_23): DELETE FAILED Claims, still downloadable.
+        self.assertEqual(self.mismatched_cases("export_service"), [])
+
+    def test_search_entry_surviving_in_replica_reported_under_search_service(self):
+        # case_16: evidence_05 holds search_1007 in customer_data_read_replica rows whose
+        # origin_system is search_service; a DELETE SUCCESS Claim does not make it absent.
+        status, steps = steps_for(self.rows, "case_16")
+        self.assertEqual(status, "INCOMPLETE")
+        self.assertIn({"phase": "FINDING", "system_id": "search_service",
+                       "resource_id": "search_1007", "operation": "REPORT_REMAINING_RECORD",
+                       "state": "PRESENT", "evidence_id": "evidence_05"},
+                      [{k: v for k, v in s.items() if k != "step_no"} for s in steps])
 
 
 class EvaluationCases(unittest.TestCase):
