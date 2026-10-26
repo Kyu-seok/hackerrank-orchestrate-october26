@@ -3,10 +3,10 @@
 import csv
 import sys
 
-from . import classification, state, steps, treatments
+from . import classification, steps, treatments
 from .activities import WorkerActions
 from .attribution import Attributor
-from .citation import cite
+from .citation import resolve
 from .dataset import Dataset, load_requests
 from .evidence import load_evidence
 
@@ -45,17 +45,21 @@ class Auditor:
         in_scope = sorted(self.attributor.resources(request), key=lambda cr: cr[0].after_retained)
         for category, resource_id in in_scope:
             retained = any(a.treatment is treatments.RETAIN for a in assessments)
-            resolution = state.reconstruct(category, resource_id, self.store, request.audit_at)
+            resolution, evidence_id = resolve(category, resource_id, self.store, request.audit_at)
+            action = self.worker_actions.latest(category.system_id, resource_id, request.audit_at)
             treatment = category.required(
-                [o for o in self.store.for_resource(category.system_id, resource_id)
-                 if o.observed_at <= request.audit_at],
-                resolution.state,
-                self.worker_actions.latest_type(category.system_id, resource_id, request.audit_at),
+                self.store.observed_by(category.system_id, resource_id, request.audit_at),
+                resolution.state, action["event_type"] if action else None,
                 audit_at=request.audit_at, retained=retained)
+            compliant = resolution.state == treatment.target
+            if not evidence_id and not compliant and action and action["reported_result"] != "SUCCESS":
+                # Only a file exported after the cutoff shows the remaining record. A finding must
+                # cite a participant-visible item from before the cutoff: the deletion worker's
+                # unsuccessful attempt on it. (A COMPLETE case drops an uncited verification.)
+                evidence_id = action["activity_id"]
             assessments.append(steps.Assessment(
                 system_id=category.system_id, resource_id=resource_id, treatment=treatment,
-                compliant=resolution.state == treatment.target,
-                evidence_id=cite(category, resource_id, resolution, self.store, request.audit_at)))
+                compliant=compliant, evidence_id=evidence_id))
         return steps.build(assessments)
 
 

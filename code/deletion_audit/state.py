@@ -29,8 +29,7 @@ def latest_by(items, time_attr):
 
 
 def reconstruct(category, resource_id, store, audit_at):
-    observations = [o for o in store.for_resource(category.system_id, resource_id)
-                    if o.observed_at <= audit_at]
+    observations = store.observed_by(category.system_id, resource_id, audit_at)
     if observations:
         latest_time = max(o.observed_at for o in observations)
         at_latest = [o for o in observations if o.observed_at == latest_time]

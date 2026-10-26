@@ -61,13 +61,11 @@ def _resolve_aliases(store, dataset):
         for resource_id, alias in _ALIAS.findall(act["details"]):
             if resource_id == act["resource_id"]:
                 aliases[(act["target_system"], alias.strip().lower())] = resource_id
-    resolved = []
-    for obs in store.observations:
-        if not obs.resource_id:
-            names = {aliases[(obs.system_id, t)] for t in obs.tokens if (obs.system_id, t) in aliases}
-            if len(names) != 1:
-                continue
-            obs = dataclasses.replace(obs, resource_id=names.pop())
-        resolved.append(obs)
-    store.observations[:] = resolved
-    store.extend(EvidenceStore())  # reset the per-Resource index
+
+    def name(obs):
+        if obs.resource_id:
+            return obs
+        names = {aliases[(obs.system_id, t)] for t in obs.tokens if (obs.system_id, t) in aliases}
+        return dataclasses.replace(obs, resource_id=names.pop()) if len(names) == 1 else None
+
+    store.rename(name)

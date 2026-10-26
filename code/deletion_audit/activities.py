@@ -22,16 +22,17 @@ def action_activities(dataset):
 
 
 class WorkerActions:
-    """Latest deletion-worker Action type per Resource, as of a cutoff."""
+    """Latest deletion-worker Action activity per Resource, as of a cutoff."""
 
     def __init__(self, dataset):
         self._by_resource = {}
         for act in action_activities(dataset):
             self._by_resource.setdefault((act["target_system"], act["resource_id"]), []).append(act)
 
-    def latest_type(self, system_id, resource_id, audit_at):
+    def latest(self, system_id, resource_id, audit_at):
+        """The latest Action activity on the Resource at or before the cutoff, or None."""
         acts = [a for a in self._by_resource.get((system_id, resource_id), ()) if a["event_time"] <= audit_at]
-        return acts[-1]["event_type"] if acts else None
+        return acts[-1] if acts else None
 
 
 def link_activities(dataset):

@@ -2,6 +2,7 @@
 
 Usage:
     python3 code/evaluation/main.py PRED_CSV [--gold GOLD_CSV] [--verbose] [--markdown OUT_MD]
+                                    [--requests REQUESTS_CSV]
 
 Only cases present in the gold file are scored. Gold defaults to
 dataset/sample_output.csv. Metrics:
@@ -13,6 +14,9 @@ dataset/sample_output.csv. Metrics:
   step fields scored separately. Missing predicted steps score zero.
 - sequence accuracy: the full ordered steps_json equals gold exactly.
 - schema errors: predicted rows that break the output contract.
+- cutoff errors (``--requests``, no gold needed): cited Evidence items captured
+  after the case's ``audit_at`` (manifest ``captured_at`` for a file_id, the
+  activity's ``event_time``, the audit entry's ``event_time``).
 """
 
 from __future__ import annotations
@@ -25,7 +29,8 @@ from collections import Counter
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_GOLD = REPO_ROOT / "dataset" / "sample_output.csv"
+DATASET = REPO_ROOT / "dataset"
+DEFAULT_GOLD = DATASET / "sample_output.csv"
 
 STATUSES = ("COMPLETE", "INCOMPLETE", "NOT_APPLICABLE")
 STEP_FIELDS = ("phase", "operation", "system_id", "resource_id", "state", "evidence_id")
@@ -105,6 +110,38 @@ def schema_errors(status: str, raw: str) -> list[str]:
 
     if all(set(s) == STEP_KEYS for s in steps) and steps != sorted(steps, key=sort_key):
         errors.append("steps are not in phase/operation/system_id/resource_id order")
+    return errors
+
+
+def _times(path: Path, id_field: str, time_field: str) -> dict[str, str]:
+    with path.open(newline="", encoding="utf-8") as f:
+        return {row[id_field]: row[time_field] for row in csv.DictReader(f)}
+
+
+def evidence_times(dataset: Path = DATASET) -> dict[str, str]:
+    """Capture time of every citable Evidence item: file_id, activity_id and audit_id."""
+    times = _times(dataset / "evidence_files.csv", "file_id", "captured_at")
+    times.update(_times(dataset / "system_activity.csv", "activity_id", "event_time"))
+    times.update(_times(dataset / "user_audit_log.csv", "audit_id", "event_time"))
+    return times
+
+
+def cutoff_errors(pred: dict, requests: Path, dataset: Path = DATASET) -> dict[str, list[str]]:
+    """{case_id: errors} for steps citing an unknown Evidence item or one captured after audit_at."""
+    audit_at = _times(requests, "case_id", "audit_at")
+    times = evidence_times(dataset)
+    errors = {}
+    for case_id, (_, raw) in sorted(pred.items()):
+        for i, step in enumerate(parse_steps(raw) or [], start=1):
+            evidence_id = step.get("evidence_id")
+            if not evidence_id or case_id not in audit_at:
+                continue
+            captured = times.get(evidence_id)
+            if captured is None:
+                errors.setdefault(case_id, []).append(f"step {i}: unknown evidence {evidence_id}")
+            elif captured > audit_at[case_id]:
+                errors.setdefault(case_id, []).append(
+                    f"step {i}: {evidence_id} captured {captured}, after audit_at {audit_at[case_id]}")
     return errors
 
 
@@ -227,10 +264,18 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--gold", type=Path, default=DEFAULT_GOLD, help="labeled answers CSV")
     parser.add_argument("--verbose", action="store_true", help="list schema errors and per-case step differences")
     parser.add_argument("--markdown", type=Path, help="also write the rendered results to this file")
+    parser.add_argument("--requests", type=Path,
+                        help="request CSV of the predictions: also check no step cites evidence after audit_at")
     args = parser.parse_args(argv)
 
-    result = score(load_answers(args.gold), load_answers(args.pred))
+    pred = load_answers(args.pred)
+    result = score(load_answers(args.gold), pred)
     text = render(result, args.verbose)
+    if args.requests:
+        late = cutoff_errors(pred, args.requests)
+        text += f"\n\nRows citing evidence after audit_at (all {len(pred)} rows): {len(late)}"
+        for case_id, errs in late.items():
+            text += f"\n- {case_id}: " + "; ".join(errs)
     print(text)
     if args.markdown:
         args.markdown.write_text(text + "\n", encoding="utf-8")

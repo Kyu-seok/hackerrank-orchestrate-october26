@@ -88,11 +88,22 @@ class EvidenceStore:
 
     def __post_init__(self):
         self._by_resource = None
+        self._exported_by = {}
+
+    def _changed(self):
+        self._by_resource = None
+        self._exported_by = {}
 
     def extend(self, other):
         self.observations.extend(other.observations)
         self.snapshots.extend(other.snapshots)
-        self._by_resource = None
+        self._changed()
+
+    def rename(self, name_of):
+        """Rename or drop Observations: ``name_of(obs)`` returns the Observation to keep
+        (possibly with a new ``resource_id``) or None to drop it."""
+        self.observations[:] = [kept for kept in map(name_of, self.observations) if kept is not None]
+        self._changed()
 
     def for_resource(self, system_id, resource_id):
         if self._by_resource is None:
@@ -102,5 +113,19 @@ class EvidenceStore:
             self._by_resource = index
         return self._by_resource.get((system_id, resource_id), [])
 
+    def observed_by(self, system_id, resource_id, audit_at):
+        """Observations of the Resource recorded at or before the Audit cutoff (each by its own time)."""
+        return [o for o in self.for_resource(system_id, resource_id) if o.observed_at <= audit_at]
+
     def covering(self, system_id):
         return [s for s in self.snapshots if s.system_id == system_id]
+
+    def exported_by(self, audit_at):
+        """The store as it existed at the Audit cutoff: only Evidence items whose manifest
+        ``captured_at`` is at or before ``audit_at`` (the citable ones)."""
+        view = self._exported_by.get(audit_at)
+        if view is None:
+            view = EvidenceStore([o for o in self.observations if o.file_captured_at <= audit_at],
+                                 [s for s in self.snapshots if s.file_captured_at <= audit_at])
+            self._exported_by[audit_at] = view
+        return view

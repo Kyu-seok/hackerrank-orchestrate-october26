@@ -4,7 +4,9 @@ Status is INCOMPLETE when there is at least one finding, COMPLETE otherwise
 (``reported_status`` is a Claim and is ignored). INCOMPLETE cases list findings
 (citing evidence), then remediation and verification of every in-scope Resource
 with empty evidence. COMPLETE cases list only verifications, each citing the
-Evidence item that proves the current state.
+Evidence item that proves the current state; a verification with no citable
+Evidence item (its proof was exported after the Audit cutoff) is left out, since
+a COMPLETE case includes only evidence-backed verification steps (AGENTS.md 6.3).
 """
 
 import json
@@ -35,6 +37,8 @@ def build(assessments):
         steps.append(_step(a.treatment.finding, a.system_id, a.resource_id, a.evidence_id))
         steps.append(_step(a.treatment.remediation, a.system_id, a.resource_id, ""))
     for a in assessments:
+        if status == COMPLETE and not a.evidence_id:
+            continue
         evidence = "" if status == INCOMPLETE else a.evidence_id
         steps.append(_step(a.treatment.verification, a.system_id, a.resource_id, evidence))
     return status, order(steps)

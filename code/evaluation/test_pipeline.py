@@ -377,6 +377,53 @@ class EvaluationCases(unittest.TestCase):
         self.assert_case_scores_perfectly(CASES / "not_a_deletion_request")
 
 
+class AuditCutoffCitations(unittest.TestCase):
+    """Never cite an Evidence item captured after the case's audit_at (AGENTS.md section 6.6)."""
+
+    # The only record showing each account sits in a bundle exported after audit_at:
+    # case_126's account_8819 (evidence_12, exported 2026-08-19, audit_at 2026-08-17) and
+    # case_532's account_3146 (evidence_49, exported 2026-01-31, audit_at 2026-01-29T12:00).
+    CASE_IDS = ("case_126", "case_532")
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        requests = Path(cls.tmp.name) / "requests.csv"
+        with open(DATASET / "deletion_requests.csv", newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            rows = [r for r in reader if r["case_id"] in cls.CASE_IDS]
+            fieldnames = reader.fieldnames
+        with open(requests, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(rows)
+        cls.requests = requests
+        cls.out = run_pipeline(requests, Path(cls.tmp.name) / "pred.csv")
+        cls.pred = scorer.load_answers(cls.out)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def test_record_known_only_from_a_later_export_is_never_cited(self):
+        self.assertEqual(sorted(self.pred), list(self.CASE_IDS))
+        self.assertEqual(scorer.cutoff_errors(self.pred, self.requests), {})
+        for case_id, (status, raw) in self.pred.items():
+            self.assertEqual(scorer.schema_errors(status, raw), [], case_id)
+
+    def test_remaining_record_finding_cites_the_failed_delete_from_before_the_cutoff(self):
+        status, steps = steps_for(read_rows(self.out), "case_126")
+        self.assertEqual(status, "INCOMPLETE")
+        finding = [s for s in steps if s["resource_id"] == "account_8819" and s["phase"] == "FINDING"]
+        self.assertEqual([(s["operation"], s["evidence_id"]) for s in finding],
+                         [("REPORT_REMAINING_RECORD", "activity_3114")])
+
+    def test_complete_case_leaves_out_a_verification_it_cannot_cite(self):
+        status, steps = steps_for(read_rows(self.out), "case_532")
+        self.assertEqual(status, "COMPLETE")
+        self.assertNotIn("account_3146", [s["resource_id"] for s in steps])
+
+
 class FullRun(unittest.TestCase):
     """With no options the pipeline answers the full request set into the root output.csv."""
 
@@ -389,6 +436,8 @@ class FullRun(unittest.TestCase):
         self.assertEqual(len(rows), 518)
         for row in rows:
             self.assertEqual(scorer.schema_errors(row["deletion_status"], row["steps_json"]), [], row["case_id"])
+        self.assertEqual(scorer.cutoff_errors(scorer.load_answers(REPO_ROOT / "output.csv"),
+                                              DATASET / "deletion_requests.csv"), {})
 
 
 if __name__ == "__main__":
