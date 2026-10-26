@@ -3,6 +3,7 @@
 import csv
 
 from . import classification, state, steps
+from .activities import WorkerActions
 from .attribution import Attributor
 from .citation import cite
 from .dataset import Dataset, load_requests
@@ -26,6 +27,7 @@ class Auditor:
                  for r in load_requests(self.dataset.path(name))}
         known.update({r.case_id: r for r in requests})
         self.attributor = Attributor(self.dataset, self.store, list(known.values()))
+        self.worker_actions = WorkerActions(self.dataset)
 
     def audit(self, request):
         """Return (deletion_status, steps) for one request."""
@@ -34,9 +36,14 @@ class Auditor:
         assessments = []
         for category, resource_id in self.attributor.resources(request):
             resolution = state.reconstruct(category, resource_id, self.store, request.audit_at)
+            treatment = category.required(
+                [o for o in self.store.for_resource(category.system_id, resource_id)
+                 if o.observed_at <= request.audit_at],
+                resolution.state,
+                self.worker_actions.latest_type(category.system_id, resource_id, request.audit_at))
             assessments.append(steps.Assessment(
-                system_id=category.system_id, resource_id=resource_id, treatment=category.treatment,
-                compliant=resolution.state == category.treatment.target,
+                system_id=category.system_id, resource_id=resource_id, treatment=treatment,
+                compliant=resolution.state == treatment.target,
                 evidence_id=cite(category, resource_id, resolution, self.store, request.audit_at)))
         return steps.build(assessments)
 
