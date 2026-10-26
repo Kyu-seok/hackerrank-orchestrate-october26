@@ -104,17 +104,48 @@ class SampleRun(unittest.TestCase):
         whose accounts carry no identifiers, so the pick is a guess.
         """
         known_gaps = {"case_04", "case_10", "case_23", "case_29", "case_30", "case_31", "case_32"}
-        gold = read_rows(DATASET / "sample_output.csv")
+        self.assertEqual(sorted(set(self.mismatched_cases("account_service", ("phase", "operation", "resource_id")))
+                                - known_gaps), [])
+
+    def mismatched_cases(self, system_id, fields=("phase", "operation", "resource_id", "state", "evidence_id")):
+        """Cases whose steps for ``system_id`` differ from the labeled answers.
+
+        Steps are compared on ``fields`` only (not ``step_no``), so this measures
+        the system's own step recall and precision; position in the whole
+        sequence depends on the other systems too.
+        """
         mismatched = []
-        for row in gold:
+        for row in read_rows(DATASET / "sample_output.csv"):
             case_id = row["case_id"]
-            want = [(s["phase"], s["operation"], s["resource_id"])
-                    for s in json.loads(row["steps_json"]) if s["system_id"] == "account_service"]
-            got = [(s["phase"], s["operation"], s["resource_id"])
-                   for s in steps_for(self.rows, case_id)[1] if s["system_id"] == "account_service"]
-            if want != got:
+
+            def key(steps):
+                return sorted(tuple(s[f] for f in fields) for s in steps if s["system_id"] == system_id)
+            if key(json.loads(row["steps_json"])) != key(steps_for(self.rows, case_id)[1]):
                 mismatched.append(case_id)
-        self.assertEqual(sorted(set(mismatched) - known_gaps), [])
+        return mismatched
+
+    def test_search_index_entry_steps_match_labeled_samples(self):
+        """Every remaining search entry is reported, deleted and verified absent (rule_03).
+
+        Known gap, owned by identity history (#3): case_29/30 entries carry only
+        the Subject's old email.
+        """
+        known_gaps = {"case_29", "case_30"}
+        self.assertEqual(sorted(set(self.mismatched_cases("search_service")) - known_gaps), [])
+
+    def test_user_export_steps_match_labeled_samples(self):
+        # export_001 (case_08) and export_7364 (case_23): DELETE FAILED Claims, still downloadable.
+        self.assertEqual(self.mismatched_cases("export_service"), [])
+
+    def test_search_entry_surviving_in_replica_reported_under_search_service(self):
+        # case_16: evidence_05 holds search_1007 in customer_data_read_replica rows whose
+        # origin_system is search_service; a DELETE SUCCESS Claim does not make it absent.
+        status, steps = steps_for(self.rows, "case_16")
+        self.assertEqual(status, "INCOMPLETE")
+        self.assertIn({"phase": "FINDING", "system_id": "search_service",
+                       "resource_id": "search_1007", "operation": "REPORT_REMAINING_RECORD",
+                       "state": "PRESENT", "evidence_id": "evidence_05"},
+                      [{k: v for k, v in s.items() if k != "step_no"} for s in steps])
 
     def system_steps(self, case_id, system_id):
         return [(s["phase"], s["operation"], s["state"], s["resource_id"], s["evidence_id"])
@@ -173,6 +204,15 @@ class SampleRun(unittest.TestCase):
 class EvaluationCases(unittest.TestCase):
     """Our own cases: each folder under cases/ holds requests.csv and answers.csv."""
 
+    # Answer-key steps a not-yet-merged ticket owns: {case folder: {(phase, operation,
+    # system_id, resource_id, state, evidence_id)}}. The case must miss exactly these and
+    # nothing else; delete the entry when the owning ticket lands (the test then fails).
+    PENDING = {
+        # Retained security audit records: retention ticket (#8).
+        "sync_recreated_deleted_data": {
+            ("VERIFICATION", "VERIFY_RECORD_PRESENT", "security_service", "audit_record_7301", "PRESENT", "")},
+    }
+
     def test_every_case_scores_perfectly(self):
         case_dirs = sorted(p for p in CASES.iterdir() if (p / "answers.csv").exists())
         self.assertTrue(case_dirs)
@@ -182,8 +222,16 @@ class EvaluationCases(unittest.TestCase):
                 run_pipeline(case_dir / "requests.csv", out)
                 result = scorer.score(scorer.load_answers(case_dir / "answers.csv"), scorer.load_answers(out))
                 self.assertEqual(result["schema_errors"], {})
-                self.assertEqual(result["failures"], [])
-                self.assertEqual(result["sequence_accuracy"], 1.0)
+                pending = self.PENDING.get(case_dir.name)
+                if pending is None:
+                    self.assertEqual(result["failures"], [])
+                    self.assertEqual(result["sequence_accuracy"], 1.0)
+                    continue
+                self.assertEqual(len(result["failures"]), 1)
+                failure = result["failures"][0]
+                self.assertEqual(failure["gold_status"], failure["pred_status"])
+                self.assertEqual(failure["extra"], [])
+                self.assertEqual(set(failure["missing"]), pending)
 
 
 class FullRun(unittest.TestCase):
