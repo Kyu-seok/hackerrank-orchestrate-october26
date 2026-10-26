@@ -47,6 +47,19 @@ python3 code/evaluation/main.py /tmp/samples.csv --verbose
 python3 -m unittest discover -s code/evaluation -p "test_*.py"
 ```
 
+PDF and image evidence is read once by Claude Sonnet 5.5 and cached in `code/llm_cache/`
+(prompt: `code/deletion_audit/prompts/evidence_extraction.md`). To fill the cache, set
+`ANTHROPIC_API_KEY` (environment or an uncommitted `.env`) and run:
+
+```bash
+python3 code/extract_evidence.py
+```
+
+Normal runs never call the model for evidence: they read the cache, and skip (with one warning)
+any PDF/image that has no cached extraction. Every real model call is appended to
+`code/llm_cache/usage.jsonl` (model, purpose, input/output tokens). `DELETION_AUDIT_OFFLINE=1`
+forces cache-only mode even with a key; `DELETION_AUDIT_LLM_CACHE` points at another cache folder.
+
 The blank template at `dataset/output.csv` is provided as a reference. Your final generated file for submission must be the root-level `output.csv`.
 
 
