@@ -98,12 +98,12 @@ class SampleRun(unittest.TestCase):
     def test_account_steps_match_labeled_samples(self):
         """Account steps (phase, operation, resource) match the sample answers.
 
-        Known gaps, owned by later tickets: case_04's account_004 appears nowhere
-        in participant data; case_10/29/30 request with a historical email
-        (identity history); case_23/31/32 share a workflow slot with other cases
-        whose accounts carry no identifiers, so the pick is a guess.
+        Known gaps: case_04's account_004 appears nowhere in participant data;
+        case_23 shares its workflow slot with three other NOT_STARTED cases but
+        only three FAILED account actions exist and none carries an identifier,
+        so its pick is a guess.
         """
-        known_gaps = {"case_04", "case_10", "case_23", "case_29", "case_30", "case_31", "case_32"}
+        known_gaps = {"case_04", "case_23"}
         gold = read_rows(DATASET / "sample_output.csv")
         mismatched = []
         for row in gold:
@@ -120,17 +120,29 @@ class SampleRun(unittest.TestCase):
 class EvaluationCases(unittest.TestCase):
     """Our own cases: each folder under cases/ holds requests.csv and answers.csv."""
 
+    def assert_case_scores_perfectly(self, case_dir):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "pred.csv"
+            run_pipeline(case_dir / "requests.csv", out)
+            result = scorer.score(scorer.load_answers(case_dir / "answers.csv"), scorer.load_answers(out))
+            self.assertEqual(result["schema_errors"], {})
+            self.assertEqual(result["failures"], [])
+            self.assertEqual(result["sequence_accuracy"], 1.0)
+
     def test_every_case_scores_perfectly(self):
         case_dirs = sorted(p for p in CASES.iterdir() if (p / "answers.csv").exists())
         self.assertTrue(case_dirs)
         for case_dir in case_dirs:
-            with self.subTest(case=case_dir.name), tempfile.TemporaryDirectory() as tmp:
-                out = Path(tmp) / "pred.csv"
-                run_pipeline(case_dir / "requests.csv", out)
-                result = scorer.score(scorer.load_answers(case_dir / "answers.csv"), scorer.load_answers(out))
-                self.assertEqual(result["schema_errors"], {})
-                self.assertEqual(result["failures"], [])
-                self.assertEqual(result["sequence_accuracy"], 1.0)
+            with self.subTest(case=case_dir.name):
+                self.assert_case_scores_perfectly(case_dir)
+
+    def test_ghost_under_old_email_found_from_current_email(self):
+        # Requested with the current email; only the pre-change email finds the surviving account.
+        self.assert_case_scores_perfectly(CASES / "email_changed_before_request")
+
+    def test_resource_linked_by_catalog_activity_is_attributed(self):
+        # The account carries no identifier in the case window; only a link-identity activity ties it.
+        self.assert_case_scores_perfectly(CASES / "resource_linked_by_catalog")
 
 
 class FullRun(unittest.TestCase):

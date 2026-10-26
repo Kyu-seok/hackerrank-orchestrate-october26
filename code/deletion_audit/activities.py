@@ -19,3 +19,9 @@ def action_activities(dataset):
     acts = [a for a in dataset.activities
             if a["event_type"] in ACTION_TYPES and a["source_system"] == ACTION_SOURCE]
     return sorted(acts, key=lambda a: (a["event_time"], a["activity_id"]))
+
+
+def link_activities(dataset):
+    """Link-identity activities, sorted by time then id."""
+    acts = [a for a in dataset.activities if a["event_type"] in LINK_TYPES]
+    return sorted(acts, key=lambda a: (a["event_time"], a["activity_id"]))

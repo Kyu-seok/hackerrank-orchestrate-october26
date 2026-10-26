@@ -4,20 +4,30 @@
    carries any value of the Identifier set (customer reference = user_id, email,
    phone, email hash), observed inside the case window [requested_at, audit_at].
    The lower bound keeps a returning Subject's earlier case out of this one.
-2. Workflow match, for categories every case covers (the account) when no
+   The Identifier set includes every historical value, so copies holding only an
+   old email, phone or email hash are found.
+2. Link match: a link-identity activity in the case window whose details name
+   any value of the Identifier set ties its Resource to the Subject.
+3. Workflow match, for categories every case covers (the account) when no
    identifier match exists. Deleted accounts often carry no identifier at all,
    so the deletion workflow is the only link: a deletion-worker Action activity
    on that system shortly before the case's ``reported_at``. Several cases can
    share a ``reported_at``, so candidates are resolved jointly over every known
    request: a Resource an identifier ties to another person, or that another
    case already matched, is excluded, and a case left with a single candidate
-   claims it (repeated until nothing changes).
+   claims it (repeated until nothing changes). Ties are narrowed first to
+   candidates seen next to the Subject's other records, then to candidates whose
+   Action result agrees with the case's ``reported_status`` (COMPLETE ~ SUCCESS,
+   PARTIALLY_COMPLETE ~ PARTIAL, NOT_STARTED ~ FAILED): the workflow reports the
+   outcome of its own action. This only picks which Resource is the Subject's;
+   the result is still never proof of the Resource's state.
 """
 
 from datetime import datetime, timedelta
 
 from . import categories
-from .activities import action_activities
+from .activities import action_activities, link_activities
+from .evidence.model import identifier_tokens
 from .identity import identifier_owners, resolve_subject
 
 # The workflow's Action activity on the account lands within this window around reported_at.
@@ -25,6 +35,8 @@ WORKFLOW_BEFORE = timedelta(minutes=80)
 WORKFLOW_AFTER = timedelta(minutes=10)
 # Categories that every deletion case covers even without an identifier match.
 ALWAYS_IN_SCOPE = (categories.USER_PROFILE,)
+# The Action result a workflow reporting this status would have seen.
+RESULT_FOR_STATUS = {"COMPLETE": "SUCCESS", "PARTIALLY_COMPLETE": "PARTIAL", "NOT_STARTED": "FAILED"}
 
 _FMT = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -40,6 +52,7 @@ class Attributor:
         self.dataset = dataset
         self.store = store
         self.actions = action_activities(dataset)
+        self.links = link_activities(dataset)
         self.owned_by = self._owners()
         self._plan = self._resolve(requests)
 
@@ -76,6 +89,17 @@ class Attributor:
                     found.add((category, obs.resource_id))
         return found, files
 
+    def _link_matches(self, request, subject):
+        """Resources a link-identity activity in the case window ties to the Subject."""
+        found = set()
+        for act in self.links:
+            if not (request.requested_at <= act["event_time"] <= request.audit_at):
+                continue
+            category = categories.category_for(act["target_system"], act["resource_id"])
+            if category is not None and identifier_tokens([act["details"]]) & subject.identifiers:
+                found.add((category, act["resource_id"]))
+        return found
+
     def _co_located(self, category, resource_id, files, audit_at):
         """Is the Resource observed in an Evidence file that also holds a Subject-linked record?"""
         return any(o.evidence_id in files and o.observed_at <= audit_at
@@ -83,14 +107,15 @@ class Attributor:
 
     # -- workflow matches -------------------------------------------------------
     def _workflow_candidates(self, category, request, subject):
+        """{resource_id: set of Action results} for the case's workflow slot."""
         lo = _shift(request.reported_at, -WORKFLOW_BEFORE)
         hi = _shift(request.reported_at, WORKFLOW_AFTER)
-        out = set()
+        out = {}
         for act in self.actions:
             if lo <= act["event_time"] <= hi and category.owns(act["target_system"], act["resource_id"]):
                 others = self.owned_by.get((category.system_id, act["resource_id"]), set()) - {subject.user_id}
                 if not others:
-                    out.add(act["resource_id"])
+                    out.setdefault(act["resource_id"], set()).add(act["reported_result"])
         return out
 
     def _resolve(self, requests):
@@ -101,6 +126,7 @@ class Attributor:
                 subjects[request.case_id] = (request, subject)
                 plan[request.case_id], linked_files[request.case_id] = \
                     self._identifier_matches(request, subject)
+                plan[request.case_id] |= self._link_matches(request, subject)
 
         for category in ALWAYS_IN_SCOPE:
             claimed = {}  # resource_id -> user_ids whose identifier match includes it
@@ -108,16 +134,18 @@ class Attributor:
                 for c, rid in found:
                     if c is category:
                         claimed.setdefault(rid, set()).add(subjects[case_id][1].user_id)
-            options = {}  # case_id -> (all candidates, preferred candidates)
+            options = {}  # case_id -> candidate tiers, most preferred first
             for case_id, (request, subject) in subjects.items():
                 if any(c is category for c, _ in plan[case_id]):
                     continue
-                cands = {rid for rid in self._workflow_candidates(category, request, subject)
-                         if not claimed.get(rid, set()) - {subject.user_id}}
-                # Prefer candidates seen next to the Subject's other records.
+                results = {rid: res for rid, res in self._workflow_candidates(category, request, subject).items()
+                           if not claimed.get(rid, set()) - {subject.user_id}}
+                cands = set(results)
                 near = {rid for rid in cands
                         if self._co_located(category, rid, linked_files[case_id], request.audit_at)}
-                options[case_id] = (cands, near)
+                agree = {rid for rid in cands
+                         if RESULT_FOR_STATUS.get(request.reported_status) in results[rid]}
+                options[case_id] = (near & agree, near, agree, cands)
             user_of = {case_id: subjects[case_id][1].user_id for case_id in options}
             first_action = {}
             for act in self.actions:  # sorted by time
@@ -134,8 +162,8 @@ def _settle(options, user_of, case_order, resource_order):
     """Give each open case one workflow Resource.
 
     A case left with exactly one candidate takes it away from cases of other
-    Subjects; repeat until stable. Each case uses its preferred candidates while
-    any remain, else all of its candidates. When only ambiguous cases are left,
+    Subjects; repeat until stable. Each case uses its first candidate tier that
+    still has candidates left (``options`` lists tiers, most preferred first). When only ambiguous cases are left,
     the earliest case (``case_order``) takes its earliest candidate
     (``resource_order``) and settling continues: the evidence cannot separate
     them, so the pick is a deterministic guess.
@@ -146,9 +174,11 @@ def _settle(options, user_of, case_order, resource_order):
     def current(case_id):
         if case_id in chosen:
             return {chosen[case_id]}
-        cands, near = options[case_id]
-        near = near - taken_from[case_id]
-        return near or (cands - taken_from[case_id])
+        for tier in options[case_id]:
+            left = tier - taken_from[case_id]
+            if left:
+                return left
+        return set()
 
     def claim(case_id, rid):
         changed = False
